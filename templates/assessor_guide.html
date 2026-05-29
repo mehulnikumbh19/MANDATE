@@ -1,0 +1,435 @@
+{% extends "base.html" %}
+{% block title %}GRC Assessor Guide & FAQ{% endblock %}
+{% block page_title %}Security Assessor Guide{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+  <h1 class="page-title"><i class="bi bi-journal-check me-2"></i>Security Assessor Guide & Interview Portfolio</h1>
+  <p class="page-subtitle">A reference playbook detailing MANDATE's scoring engine, assessor use cases, and AWS/Amazon Security interview answers.</p>
+</div>
+
+<!-- Nav Tabs -->
+<ul class="nav nav-pills mb-4 gap-2" id="guideTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="scoring-tab" data-bs-toggle="pill" data-bs-target="#scoring" type="button" role="tab" aria-controls="scoring" aria-selected="true">
+      <i class="bi bi-grid-3x3-gap me-2"></i>1. Risk Scoring Engine
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="explain-tab" data-bs-toggle="pill" data-bs-target="#explain" type="button" role="tab" aria-controls="explain" aria-selected="false">
+      <i class="bi bi-chat-left-quote me-2"></i>2. How to Explain in Interviews
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="usecases-tab" data-bs-toggle="pill" data-bs-target="#usecases" type="button" role="tab" aria-controls="usecases" aria-selected="false">
+      <i class="bi bi-search me-2"></i>3. Assessor Use Cases
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="faq-tab" data-bs-toggle="pill" data-bs-target="#faq" type="button" role="tab" aria-controls="faq" aria-selected="false">
+      <i class="bi bi-question-circle me-2"></i>4. 10 Interview Questions & Answers
+    </button>
+  </li>
+</ul>
+
+<!-- Tab Contents -->
+<div class="tab-content" id="guideTabContent">
+  
+  <!-- Tab 1: Risk Scoring Methodology -->
+  <div class="tab-pane fade show active" id="scoring" role="tabpanel" aria-labelledby="scoring-tab">
+    <div class="card shadow-sm animate-fade-in mb-4">
+      <div class="card-header card-header-subtle">
+        <i class="bi bi-grid-3x3-gap me-2"></i>Enterprise 5x5 Risk Matrix & Scoring Framework
+      </div>
+      <div class="card-body">
+        <p class="text-muted small">
+          MANDATE evaluates supplier risk using a traditional <strong>5x5 Risk Assessment Matrix</strong> mapping <strong>Likelihood (1–5)</strong> against <strong>Impact (1–5)</strong>. 
+          The overall score is a simple product: <code>Likelihood × Impact</code>, yielding values from 1 to 25.
+        </p>
+
+        <div class="row g-4 align-items-center">
+          <div class="col-md-7">
+            <div class="table-responsive">
+              <table class="table table-bordered text-center risk-matrix-table shadow-sm mb-0">
+                <thead>
+                  <tr class="table-light">
+                    <th rowspan="2" class="align-middle">Likelihood (L)</th>
+                    <th colspan="5">Impact (I)</th>
+                  </tr>
+                  <tr class="table-light">
+                    <th>1 (Negligible)</th>
+                    <th>2 (Minor)</th>
+                    <th>3 (Moderate)</th>
+                    <th>4 (Major)</th>
+                    <th>5 (Critical)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="table-light fw-semibold">5 (Almost Certain)</td>
+                    <td class="matrix-cell-5">5 (Med)</td>
+                    <td class="matrix-cell-6">10 (High)</td>
+                    <td class="matrix-cell-8">15 (High)</td>
+                    <td class="matrix-cell-9">20 (Crit)</td>
+                    <td class="matrix-cell-9">25 (Crit)</td>
+                  </tr>
+                  <tr>
+                    <td class="table-light fw-semibold">4 (Likely)</td>
+                    <td class="matrix-cell-3">4 (Low)</td>
+                    <td class="matrix-cell-5">8 (Med)</td>
+                    <td class="matrix-cell-6">12 (High)</td>
+                    <td class="matrix-cell-8">16 (High)</td>
+                    <td class="matrix-cell-9">20 (Crit)</td>
+                  </tr>
+                  <tr>
+                    <td class="table-light fw-semibold">3 (Possible)</td>
+                    <td class="matrix-cell-2">3 (Low)</td>
+                    <td class="matrix-cell-4">6 (Med)</td>
+                    <td class="matrix-cell-5">9 (Med)</td>
+                    <td class="matrix-cell-6">12 (High)</td>
+                    <td class="matrix-cell-8">15 (High)</td>
+                  </tr>
+                  <tr>
+                    <td class="table-light fw-semibold">2 (Unlikely)</td>
+                    <td class="matrix-cell-1">2 (Low)</td>
+                    <td class="matrix-cell-3">4 (Low)</td>
+                    <td class="matrix-cell-4">6 (Med)</td>
+                    <td class="matrix-cell-5">8 (Med)</td>
+                    <td class="matrix-cell-6">10 (High)</td>
+                  </tr>
+                  <tr>
+                    <td class="table-light fw-semibold">1 (Rare)</td>
+                    <td class="matrix-cell-1">1 (Low)</td>
+                    <td class="matrix-cell-1">2 (Low)</td>
+                    <td class="matrix-cell-2">3 (Low)</td>
+                    <td class="matrix-cell-3">4 (Low)</td>
+                    <td class="matrix-cell-5">5 (Med)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-md-5">
+            <h6 class="fw-semibold">Score Boundaries & Thresholds:</h6>
+            <ul class="small text-muted ps-3 mb-4">
+              <li class="mb-2"><span class="badge bg-success me-2">Low</span> Score **1 – 4**: Standard low-risk review, acceptable with general logging.</li>
+              <li class="mb-2"><span class="badge bg-info text-dark me-2">Medium</span> Score **5 – 9**: Requires baseline controls (TLS 1.2+, standard SSO/MFA).</li>
+              <li class="mb-2"><span class="badge bg-warning text-dark me-2">High</span> Score **10 – 16**: Requires active continuous SIEM logging, SOC 2 verification, and compensating controls.</li>
+              <li class="mb-2"><span class="badge bg-danger me-2">Critical</span> Score **17 – 25**: Requires immediate escalation, CISO exception signs, and strict conditions.</li>
+            </ul>
+
+            <h6 class="fw-semibold"><i class="bi bi-shield-check text-success me-1"></i>Inherent vs. Residual Risk</h6>
+            <p class="small text-muted mb-0">
+              **Inherent Risk** measures the raw, unmitigated threat landscape (e.g., if a supplier processes raw patient medical histories). 
+              **Residual Risk** is the remaining risk after validating the vendor's administrative and technical controls (such as SSO federation, AES-256 databases, and audited SOC 2 Type II reports).
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 2: How to Explain in Interviews -->
+  <div class="tab-pane fade" id="explain" role="tabpanel" aria-labelledby="explain-tab">
+    <div class="card shadow-sm animate-fade-in mb-4">
+      <div class="card-header card-header-subtle">
+        <i class="bi bi-chat-left-quote me-2"></i>GRC / Security Assessor Portfolio Pitch
+      </div>
+      <div class="card-body">
+        <h5 class="fw-semibold mb-3">Talking Track Script (Use in your interviews)</h5>
+        <div class="bg-light p-3 rounded border font-monospace small mb-4 text-dark" style="white-space: pre-wrap; line-height: 1.6;">
+"In my previous work and as part of demonstrating my security assessment capabilities, I designed and built MANDATE—a relational third-party security risk tracker using Python (Flask) and SQLite.
+
+The goal of this platform was to move beyond standard offline checklists and automate core GRC triage tasks:
+1. **Threat Response Auditing**: Built a semantic heuristic processor in Python that automatically scans raw supplier responses for vague statements like 'industry standard' or critical gaps like 'no MFA' or 'plain text passwords'.
+2. **Context-Aware Evidence Gap Alerts**: Created background check engines that evaluate the supplier data type. For instance, if a vendor handles Protected Health Information (PHI) or cardholder data, the database automatically flags them as high-risk if a signed HIPAA BAA or active PCI DSS Attestation of Compliance is missing.
+3. **Administrative Exceptions Register**: Modeled a full business risk acceptance (Approval/Exceptions) table that logs CISO justifications, compensating controls, and automatically flags expired exceptions on subsequent assessor dashboards.
+
+Building this tool allowed me to understand the end-to-end data relationships in vendor audits—ensuring that access controls, subprocessor chains, cross-border privacy boundaries, and residual risks are documented in a management-ready format."
+        </div>
+        <div class="alert alert-info d-flex align-items-center mb-0">
+          <i class="bi bi-info-circle-fill me-3 fs-5"></i>
+          <span class="small">Use the script above when asked: *'Tell me about a time you automated security reviews,'* or *'How do you manage supplier compliance at scale?'*</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 3: Security Assessor Use Cases -->
+  <div class="tab-pane fade" id="usecases" role="tabpanel" aria-labelledby="usecases-tab">
+    <!-- Use Case 1 -->
+    <div class="card shadow-sm animate-fade-in mb-4 border-danger">
+      <div class="card-header card-header-subtle d-flex align-items-center justify-content-between">
+        <span class="fw-semibold"><i class="bi bi-heart-pulse text-danger me-2"></i>Case A: PHI Vendor lacking signed HIPAA BAA & SOC 2</span>
+        <span class="badge bg-danger">Critical Risk</span>
+      </div>
+      <div class="card-body">
+        <p class="small text-muted">
+          <strong>Supplier:</strong> MedForms Processor. Processes patient clinical intake forms and medical charts.
+        </p>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <h6 class="fw-semibold text-danger small">1. Gaps Identified</h6>
+            <ul class="small text-muted ps-3 mb-0">
+              <li>Handles PHI data but has no signed Business Associate Agreement (BAA) on file.</li>
+              <li>No SOC 2 Type II or HITRUST certificate available (audits planned for 2026).</li>
+              <li>No formal incident response (IR) plan or backup testing cadence in place.</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h6 class="fw-semibold text-success small">2. Assessor Action Plan</h6>
+            <ul class="small text-muted ps-3 mb-0">
+              <li><strong>Block Approval</strong>: Review status is flagged as *Pending Evidence* and approval status marked *Rejected*.</li>
+              <li><strong>Queue Remediation</strong>: Mandate open actions created for legal to sign a BAA and compliance to request incident playbooks.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Use Case 2 -->
+    <div class="card shadow-sm animate-fade-in mb-4 border-warning">
+      <div class="card-header card-header-subtle d-flex align-items-center justify-content-between">
+        <span class="fw-semibold"><i class="bi bi-credit-card text-warning me-2"></i>Case B: Payment platform with administrative MFA gaps</span>
+        <span class="badge bg-warning text-dark">High Risk</span>
+      </div>
+      <div class="card-body">
+        <p class="small text-muted">
+          <strong>Supplier:</strong> PeopleCore HR. Processes corporate payroll, benefits, and employee PII.
+        </p>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <h6 class="fw-semibold text-danger small">1. Gaps Identified</h6>
+            <ul class="small text-muted ps-3 mb-0">
+              <li>Supplier questionnaire response admitted legacy administrator accounts do not enforce MFA.</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h6 class="fw-semibold text-success small">2. Assessor Action Plan & Compensating Controls</h6>
+            <ul class="small text-muted ps-3 mb-0">
+              <li><strong>Approve with Conditions</strong>: Approved with Exception register entry created.</li>
+              <li><strong>Compensating Controls</strong>: Enforced strict IP allowlisting for admin access, active audit logging forwarded to SIEM, and a mandatory 90-day deadline for full MFA enforcement.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Use Case 3 -->
+    <div class="card shadow-sm animate-fade-in border-info">
+      <div class="card-header card-header-subtle d-flex align-items-center justify-content-between">
+        <span class="fw-semibold"><i class="bi bi-globe text-info me-2"></i>Case C: SaaS Subprocessor with Cross-Border Data Transfer risk</span>
+        <span class="badge bg-info text-dark">Medium Risk</span>
+      </div>
+      <div class="card-body">
+        <p class="small text-muted">
+          <strong>Supplier:</strong> FinanceSync API. Connects European customer endpoints to a financial portal.
+        </p>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <h6 class="fw-semibold text-danger small">1. Gaps Identified</h6>
+            <ul class="small text-muted ps-3 mb-0">
+              <li>Cross-border transfer of UK/EU data sets.</li>
+              <li>The Data Processing Agreement (DPA) was expired/outdated and lacks UK GDPR Standard Contractual Clauses (SCCs).</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h6 class="fw-semibold text-success small">2. Assessor Action Plan</h6>
+            <ul class="small text-muted ps-3 mb-0">
+              <li><strong>Escalated Review</strong>: Review status changed to *In Review* and residual risk scoring maintained at *Medium*.</li>
+              <li><strong>Contract Action</strong>: Legal team tasked to execute an updated DPA containing modern UK/EU SCCs prior to standard signs.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 4: 10 Interview Questions & Answers -->
+  <div class="tab-pane fade" id="faq" role="tabpanel" aria-labelledby="faq-tab">
+    <div class="accordion" id="faqAccordion">
+      
+      <!-- Q1 -->
+      <div class="accordion-item shadow-sm mb-3 border rounded">
+        <h2 class="accordion-header" id="faqHead1">
+          <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCol1" aria-expanded="false" aria-controls="faqCol1">
+            Q1: How do you evaluate a vendor's encryption controls for data at rest and in transit?
+          </button>
+        </h2>
+        <div id="faqCol1" class="accordion-collapse collapse" aria-labelledby="faqHead1" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-muted small" style="line-height: 1.6;">
+            <strong>Assessor Response:</strong><br>
+            "For **data at rest**, I verify the algorithm used (preferably AES-256) and the key management scheme (e.g., AWS KMS with customer-managed keys rotated annually). I review the SOC 2 Type II report under the confidentiality trust criteria to ensure keys are separated from encrypted databases. For **data in transit**, I require standard TLS 1.2 or 1.3 encryption, verifying that weak protocols (like SSL, TLS 1.0, and 1.1) and insecure cipher suites are disabled by default. If a supplier responds with vague phrases like 'industry standard encryption,' MANDATE's automated parsing flags the response as vague, prompting the assessor to ask for specific configurations."
+          </div>
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="accordion-item shadow-sm mb-3 border rounded">
+        <h2 class="accordion-header" id="faqHead2">
+          <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCol2" aria-expanded="false" aria-controls="faqCol2">
+            Q2: If a critical vendor processes PHI but does not have a SOC 2 Type II or HITRUST, what is your mitigation strategy?
+          </button>
+        </h2>
+        <div id="faqCol2" class="accordion-collapse collapse" aria-labelledby="faqHead2" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-muted small" style="line-height: 1.6;">
+            <strong>Assessor Response:</strong><br>
+            "A PHI supplier lacking SOC 2 or HITRUST constitutes a **critical security risk**. My strategy is:
+            1. **Contractual Security**: Force execution of a Business Associate Agreement (BAA) with strict liability clauses.
+            2. **Compensating Controls**: Request alternative evidence including: (a) ISO 27001 certificate scope validation, (b) detailed network architecture diagram, (c) evidence of monthly vulnerability scans and quarterly external penetration tests.
+            3. **Operational limits**: Work with the business team to restrict vendor ingestion to highly pseudonymized or tokenized data sets, avoiding raw PHI transfer where possible. In MANDATE, such gaps automatically block standard approvals and trigger a formal exception review pipeline."
+          </div>
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="accordion-item shadow-sm mb-3 border rounded">
+        <h2 class="accordion-header" id="faqHead3">
+          <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCol3" aria-expanded="false" aria-controls="faqCol3">
+            Q3: How do you differentiate between inherent risk and residual risk when auditing cloud suppliers?
+          </button>
+        </h2>
+        <div id="faqCol3" class="accordion-collapse collapse" aria-labelledby="faqHead3" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-muted small" style="line-height: 1.6;">
+            <strong>Assessor Response:</strong><br>
+            "**Inherent risk** is the baseline risk of the supplier engagement *before* any security controls are evaluated. It is based strictly on business criticality, data classifications (e.g., PHI, PCI), and system connectivity. **Residual risk** is the threat level remaining *after* the assessor reviews and validates the supplier's controls. 
+            For example, a vendor storing employee payroll data has high inherent risk. If we validate they enforce SAML SSO, MFA, AES-256 databases, and possess a clean SOC 2 Type II report, the residual risk drops to low or medium. If control gaps are found (such as legacy admin accounts without MFA), the residual risk score remains high until compensating controls are logged."
+          </div>
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="accordion-item shadow-sm mb-3 border rounded">
+        <h2 class="accordion-header" id="faqHead4">
+          <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCol4" aria-expanded="false" aria-controls="faqCol4">
+            Q4: What specific evidence do you look for in a SOC 2 Type II report to verify access control efficacy?
+          </button>
+        </h2>
+        <div id="faqCol4" class="accordion-collapse collapse" aria-labelledby="faqHead4" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-muted small" style="line-height: 1.6;">
+            <strong>Assessor Response:</strong><br>
+            "When reviewing a SOC 2 Type II report for Access Control:
+            1. **Section III (System Description)**: Verify that the audit scope matches the services, production databases, and physical facilities we are actually utilizing.
+            2. **Section IV (Trust Services Criteria)**: I look at the access controls (specifically CC6 series). I verify that: (a) logical access is restricted to authorized personnel, (b) MFA is active for production consoles, (c) user authorization lists are updated and reviewed quarterly, and (d) user terminations result in immediate revocation of system access.
+            3. **Assessor Opinions & Exceptions**: I check the auditor's test results for any noted exceptions in Section IV. If exceptions exist, I request the vendor's management response to check if they have implemented compensating controls."
+          </div>
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="accordion-item shadow-sm mb-3 border rounded">
+        <h2 class="accordion-header" id="faqHead5">
+          <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCol5" aria-expanded="false" aria-controls="faqCol5">
+            Q5: How do you address OAuth and API access security risks during a third-party review?
+          </button>
+        </h2>
+        <div id="faqCol5" class="accordion-collapse collapse" aria-labelledby="faqHead5" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-muted small" style="line-height: 1.6;">
+            <strong>Assessor Response:</strong><br>
+            "API integrations introduce significant structural risks. I audit:
+            1. **Authentication**: Enforce OAuth 2.0 with short-lived tokens instead of permanent, static API keys where possible.
+            2. **Permissions**: Verify that the API scope adheres to the **Principle of Least Privilege** (e.g., read-only scopes instead of read-write).
+            3. **Auditability**: Verify that API transactions are fully logged, and anomaly detection is active to flag bulk data exfiltration.
+            4. **Network boundaries**: Validate whether IP allowlisting or VPC peering is implemented. In MANDATE, a vendor using APIs without anomaly detection or with permanent keys is flagged for a formal follow-up."
+          </div>
+        </div>
+      </div>
+
+      <!-- Q6 -->
+      <div class="accordion-item shadow-sm mb-3 border rounded">
+        <h2 class="accordion-header" id="faqHead6">
+          <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCol6" aria-expanded="false" aria-controls="faqCol6">
+            Q6: How do you handle subprocessor risk when a vendor relies on another cloud infrastructure provider?
+          </button>
+        </h2>
+        <div id="faqCol6" class="accordion-collapse collapse" aria-labelledby="faqHead6" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-muted small" style="line-height: 1.6;">
+            <strong>Assessor Response:</strong><br>
+            "A cloud vendor's security is only as strong as its subprocessor chain. During assessments, I require a list of all subprocessors processing our data sets. I verify:
+            1. **Flow-down contracts**: Confirm that the vendor's contracts bind the subprocessors to the same data protection standards (e.g., HIPAA BAA clauses, GDPR DPA protections).
+            2. **Isolation**: Verify that customer data sets are logically or physically isolated in the subprocessor environment.
+            3. **Hosting Infrastructure**: Review the hosting subprocessor's SOC 2 report (e.g., AWS SOC 2) to validate physical and logical host isolation. In MANDATE, we track the subprocessor list status as an evidence record, verifying validity and notifying the assessor of outdated lists."
+          </div>
+        </div>
+      </div>
+
+      <!-- Q7 -->
+      <div class="accordion-item shadow-sm mb-3 border rounded">
+        <h2 class="accordion-header" id="faqHead7">
+          <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCol7" aria-expanded="false" aria-controls="faqCol7">
+            Q7: If a supplier has a critical exception on administrative MFA, what compensating controls might you accept?
+          </button>
+        </h2>
+        <div id="faqCol7" class="accordion-collapse collapse" aria-labelledby="faqHead7" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-muted small" style="line-height: 1.6;">
+            <strong>Assessor Response:</strong><br>
+            "If administrative MFA is not supported due to legacy constraints, I would evaluate compensating controls to reduce likelihood and impact:
+            1. **Strict IP Allowlisting**: Restrict administrative endpoints exclusively to the vendor's corporate VPN/IP ranges.
+            2. **Active Audit Logging**: Enable verbose logging on administrative actions with alerts forwarded to an active SIEM platform or SOC team.
+            3. **Short-Lived Sessions**: Reduce session timeouts for administrative credentials.
+            4. **Quarterly Privileged Access Auditing**: Conduct regular review cycles of access lists. 
+            In MANDATE, these controls are documented in the risk assessment and exceptions registry (`Approval` table) to maintain visibility and track enforcement timelines."
+          </div>
+        </div>
+      </div>
+
+      <!-- Q8 -->
+      <div class="accordion-item shadow-sm mb-3 border rounded">
+        <h2 class="accordion-header" id="faqHead8">
+          <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCol8" aria-expanded="false" aria-controls="faqCol8">
+            Q8: How do you assess a vendor's data retention and deletion policies for compliance?
+          </button>
+        </h2>
+        <div id="faqCol8" class="accordion-collapse collapse" aria-labelledby="faqHead8" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-muted small" style="line-height: 1.6;">
+            <strong>Assessor Response:</strong><br>
+            "During assessments, I review the supplier's **Data Retention Schedule** and **Data Deletion Policy** to ensure compliance with privacy laws (e.g., GDPR, CCPA). I verify:
+            1. **Deletion SLA**: Confirm that the vendor provides an SLA (typically 30 days or less) to delete customer data upon contract termination.
+            2. **Secure Disposal**: Verify that deletion methods adhere to standards like **NIST SP 800-88 R1** for media sanitization.
+            3. **Deletion Certification**: Require the vendor to issue a formal Certificate of Deletion upon completion. If a supplier's response to deletion methods is vague or lacks timeline commitments, MANDATE flags the record to ensure the assessor follows up."
+          </div>
+        </div>
+      </div>
+
+      <!-- Q9 -->
+      <div class="accordion-item shadow-sm mb-3 border rounded">
+        <h2 class="accordion-header" id="faqHead9">
+          <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCol9" aria-expanded="false" aria-controls="faqCol9">
+            Q9: How do you manage cross-border data transfer risks for vendors based outside the US/EU?
+          </button>
+        </h2>
+        <div id="faqCol9" class="accordion-collapse collapse" aria-labelledby="faqHead9" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-muted small" style="line-height: 1.6;">
+            <strong>Assessor Response:</strong><br>
+            "Cross-border transfers (e.g., moving EU/UK customer data to non-adequate countries) introduce regulatory and compliance risks under GDPR. I audit:
+            1. **Transfer Mechanisms**: Ensure a valid legal mechanism is in place, such as EU/UK **Standard Contractual Clauses (SCCs)** or the Data Privacy Framework.
+            2. **Transfer Impact Assessment (TIA)**: Verify that the vendor has completed a TIA evaluating local access laws.
+            3. **Technical Safeguards**: Ensure supplementary measures are active, including end-to-end encryption where keys are held within the originating region. In MANDATE, international locations are recorded, and DPAs/SCC status is logged as evidence to ensure legal compliance."
+          </div>
+        </div>
+      </div>
+
+      <!-- Q10 -->
+      <div class="accordion-item shadow-sm mb-3 border rounded">
+        <h2 class="accordion-header" id="faqHead10">
+          <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCol10" aria-expanded="false" aria-controls="faqCol10">
+            Q10: What incident response evidence do you require from a supplier during onboarding?
+          </button>
+        </h2>
+        <div id="faqCol10" class="accordion-collapse collapse" aria-labelledby="faqHead10" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-muted small" style="line-height: 1.6;">
+            <strong>Assessor Response:</strong><br>
+            "During supplier onboarding, I require specific incident response evidence:
+            1. **Documented IR Plan**: A copy of the vendor's formal Incident Response Policy and Playbook.
+            2. **Breach Notification SLA**: Contractual commitment to notify us of a confirmed data breach within a compliant timeframe (e.g., 24 to 72 hours).
+            3. **Tabletop Exercises**: Evidence of annual IR plan testing (such as executive summary results or logs).
+            4. **Centralized Logging**: Validation that critical auth and access logs are retained for at least 90 days. If the vendor admits in their questionnaire response that they have 'no formal IR plan,' MANDATE triggers an immediate critical risk flag."
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

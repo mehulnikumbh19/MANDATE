@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Questionnaire Review{% endblock %}
+{% block page_title %}Questionnaire Review{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+  <h1 class="page-title"><i class="bi bi-clipboard2-check-fill"></i>Questionnaire Review</h1>
+  <p class="page-subtitle">{{ qrs|length }} questionnaire response(s) — flagged by automated response quality checks.</p>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+  <div class="card-body" style="padding:1rem 1.25rem;">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label">Search</label>
+        <input type="text" class="form-control form-control-sm" name="q"
+               placeholder="Question, response, or vendor…"
+               value="{{ filters.get('q','') }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Domain</label>
+        <select class="form-select form-select-sm" name="domain">
+          <option value="">All Domains</option>
+          {% for d in domains %}
+          <option value="{{ d }}" {% if filters.get('domain') == d %}selected{% endif %}>{{ d }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Risk Flag</label>
+        <select class="form-select form-select-sm" name="risk_flag">
+          <option value="">All Flags</option>
+          {% for rf in ['None','Low','Medium','High','Critical'] %}
+          <option value="{{ rf }}" {% if filters.get('risk_flag') == rf %}selected{% endif %}>{{ rf }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Vendor</label>
+        <select class="form-select form-select-sm" name="vendor_id">
+          <option value="">All Vendors</option>
+          {% for v in vendors %}
+          <option value="{{ v.id }}" {% if filters.get('vendor_id')|string == v.id|string %}selected{% endif %}>{{ v.vendor_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary btn-sm w-100">Filter</button>
+      </div>
+    </form>
+    <div class="mt-2 d-flex gap-2 flex-wrap">
+      <a href="?risk_flag=High" class="badge-pill-filter {% if filters.get('risk_flag') == 'High' %}active{% endif %}">
+        <i class="bi bi-exclamation-triangle-fill me-1"></i>High Risk Only
+      </a>
+      <a href="?risk_flag=Critical" class="badge-pill-filter {% if filters.get('risk_flag') == 'Critical' %}active{% endif %}">
+        <i class="bi bi-x-octagon-fill me-1"></i>Critical Only
+      </a>
+      <a href="{{ url_for('questionnaires') }}" class="badge-pill-filter">
+        <i class="bi bi-x-circle me-1"></i>Clear
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Vendor</th>
+            <th>Domain</th>
+            <th>Question</th>
+            <th>Response Summary</th>
+            <th>Quality</th>
+            <th>Risk Flag</th>
+            <th>Follow-Up</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set qmap = {'Acceptable':'success','Incomplete':'warning','Vague':'warning','Missing':'danger','High Risk':'danger','Needs Evidence':'info','Conflicting':'danger'} %}
+          {% for q in qrs %}
+          <tr class="{% if q.risk_flag in ['High','Critical'] %}table-danger-subtle{% elif q.risk_flag == 'Medium' %}table-warning-subtle{% endif %}">
+            <td>
+              <a href="{{ url_for('vendor_detail', vendor_id=q.vendor_id) }}" style="color:var(--accent-bright); font-weight:600; font-size:0.78rem;">
+                {{ q.vendor.vendor_name }}
+              </a>
+            </td>
+            <td><span class="badge bg-secondary-subtle text-secondary" style="border:1px solid rgba(255,255,255,0.06); font-size:0.65rem;">{{ q.domain }}</span></td>
+            <td style="font-size:0.78rem; max-width:200px; color:var(--text-primary);">{{ q.question_text }}</td>
+            <td style="font-size:0.75rem; max-width:200px; color:var(--text-muted);">
+              {% if q.vendor_response %}
+                "{{ q.vendor_response[:80] }}{% if q.vendor_response|length > 80 %}…{% endif %}"
+              {% else %}
+                <em style="color:var(--red);">No response</em>
+              {% endif %}
+              {% if q.analyst_notes %}
+              <div style="margin-top:0.3rem; color:var(--orange); font-size:0.72rem;"><i class="bi bi-sticky-fill me-1"></i>{{ q.analyst_notes[:60] }}</div>
+              {% endif %}
+            </td>
+            <td><span class="badge bg-{{ qmap.get(q.response_quality,'secondary') }}">{{ q.response_quality or '—' }}</span></td>
+            <td><span class="badge bg-{{ risk_badge.get(q.risk_flag,'secondary') }}">{{ q.risk_flag or 'None' }}</span></td>
+            <td>
+              {% if q.follow_up_required %}
+              <span class="badge bg-warning-subtle text-warning" style="border:1px solid rgba(255,255,255,0.06)"><i class="bi bi-flag-fill"></i> Yes</span>
+              {% else %}
+              <span style="color:var(--text-muted); font-size:0.72rem;">—</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7" style="text-align:center; color:var(--text-muted); padding:3rem;">
+              <i class="bi bi-inbox" style="font-size:1.5rem; display:block; margin-bottom:0.5rem;"></i>
+              No questionnaire responses found.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

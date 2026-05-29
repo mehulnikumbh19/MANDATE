@@ -1,0 +1,31 @@
+# Python bytecode and caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+.env
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+
+# SQLite database files
+*.db
+data/*.db
+data/mandate.db
+
+# Generated data and reports
+exports/
+*.xlsx
+*.csv
+
+# OS and IDE configuration files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+desktop.ini

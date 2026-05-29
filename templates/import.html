@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Import Data{% endblock %}
+{% block page_title %}Import Data{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+  <h1 class="page-title"><i class="bi bi-cloud-upload-fill"></i>Import CSV Data</h1>
+  <p class="page-subtitle">Load bulk records for Vendors, Questionnaire Reviews, or Evidence records using CSV templates.</p>
+</div>
+
+<div class="row g-3 mb-4">
+  <!-- Import Form Card -->
+  <div class="col-md-7">
+    <div class="card animate-fade-in">
+      <div class="card-header card-header-subtle">
+        <i class="bi bi-file-earmark-arrow-up-fill me-2"></i>Upload CSV File
+      </div>
+      <div class="card-body">
+        <form action="{{ url_for('import_data') }}" method="POST" enctype="multipart/form-data">
+          <div class="mb-4">
+            <label for="import_type" class="form-label">Select Import Entity Type</label>
+            <select class="form-select" id="import_type" name="import_type" required>
+              <option value="" disabled selected>-- Select Type --</option>
+              <option value="vendors">Vendors Inventory</option>
+              <option value="questionnaires">Questionnaire Reviews</option>
+              <option value="evidence">Evidence Records</option>
+            </select>
+            <div style="font-size:0.72rem; color:var(--text-muted); margin-top:0.35rem;">
+              Ensure your CSV column headers exactly match the specifications listed on the right.
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="file" class="form-label">Select CSV File</label>
+            <input class="form-control" type="file" id="file" name="file" accept=".csv" required>
+            <div style="font-size:0.72rem; color:var(--text-muted); margin-top:0.35rem;">
+              Only standard UTF-8 encoded .csv files are supported. Maximum file size: 10MB.
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center gap-2">
+            <button type="submit" class="btn btn-primary d-flex align-items-center">
+              <i class="bi bi-cloud-arrow-up-fill me-2"></i> Import Data
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- CSV Format Specifications -->
+  <div class="col-md-5">
+    <div class="card animate-fade-in">
+      <div class="card-header card-header-subtle">
+        <i class="bi bi-info-circle-fill me-2"></i>CSV File Specifications
+      </div>
+      <div class="card-body">
+        <div class="accordion accordion-flush" id="specAccordion">
+          
+          <!-- Vendors Spec -->
+          <div class="accordion-item" style="background:transparent; border-color:var(--border-default);">
+            <h2 class="accordion-header" id="headingVendors">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseVendors" aria-expanded="false" aria-controls="collapseVendors" style="background:var(--bg-elevated); color:var(--text-primary); font-size:0.82rem;">
+                <i class="bi bi-building-fill me-2" style="color:var(--accent)"></i> Vendors Format
+              </button>
+            </h2>
+            <div id="collapseVendors" class="accordion-collapse collapse" aria-labelledby="headingVendors" data-bs-parent="#specAccordion">
+              <div class="accordion-body px-0 py-3">
+                <p style="font-size:0.75rem; color:var(--text-muted);">Column headers must match exactly:</p>
+                <div style="padding:0.5rem 0.75rem; background:var(--bg-elevated); border-radius:var(--radius-sm); font-family:var(--font-mono); font-size:0.68rem; color:var(--accent-bright); max-height:120px; overflow-y:auto; margin-bottom:0.5rem;">
+                  vendor_name, vendor_category, business_owner, security_reviewer, department, service_description, system_supported, data_types_processed, sensitive_data, phi_involved, payment_data, pii_involved, cloud_hosted, country_region, criticality, inherent_risk, residual_risk, review_status, approval_status, onboarding_date, last_review_date, next_review_date, notes
+                </div>
+                <ul style="font-size:0.72rem; padding-left:1rem; color:var(--text-muted); margin:0;">
+                  <li><strong style="color:var(--text-secondary);">vendor_name</strong>: Required (text)</li>
+                  <li><strong style="color:var(--text-secondary);">boolean fields</strong>: True/False or Yes/No</li>
+                  <li><strong style="color:var(--text-secondary);">criticality</strong>: Low / Medium / High / Critical</li>
+                  <li><strong style="color:var(--text-secondary);">dates</strong>: YYYY-MM-DD format</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Questionnaires Spec -->
+          <div class="accordion-item" style="background:transparent; border-color:var(--border-default);">
+            <h2 class="accordion-header" id="headingQuestionnaires">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseQuestionnaires" aria-expanded="false" aria-controls="collapseQuestionnaires" style="background:var(--bg-elevated); color:var(--text-primary); font-size:0.82rem;">
+                <i class="bi bi-clipboard2-check-fill me-2" style="color:var(--accent)"></i> Questionnaire Format
+              </button>
+            </h2>
+            <div id="collapseQuestionnaires" class="accordion-collapse collapse" aria-labelledby="headingQuestionnaires" data-bs-parent="#specAccordion">
+              <div class="accordion-body px-0 py-3">
+                <p style="font-size:0.75rem; color:var(--text-muted);">Requires a mapping to an existing Vendor ID.</p>
+                <div style="padding:0.5rem 0.75rem; background:var(--bg-elevated); border-radius:var(--radius-sm); font-family:var(--font-mono); font-size:0.68rem; color:var(--accent-bright); margin-bottom:0.5rem;">
+                  vendor_id, domain, question_text, vendor_response, analyst_notes, reviewer, review_date
+                </div>
+                <ul style="font-size:0.72rem; padding-left:1rem; color:var(--text-muted); margin:0;">
+                  <li><strong style="color:var(--text-secondary);">vendor_id</strong>: Required (Integer)</li>
+                  <li><strong style="color:var(--text-secondary);">domain</strong>: Access Control, Encryption, Logging, etc.</li>
+                  <li><strong style="color:var(--text-secondary);">vendor_response</strong>: Triggers automated risk detection</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Evidence Spec -->
+          <div class="accordion-item" style="background:transparent; border-color:var(--border-default);">
+            <h2 class="accordion-header" id="headingEvidence">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEvidence" aria-expanded="false" aria-controls="collapseEvidence" style="background:var(--bg-elevated); color:var(--text-primary); font-size:0.82rem;">
+                <i class="bi bi-folder-fill me-2" style="color:var(--accent)"></i> Evidence Format
+              </button>
+            </h2>
+            <div id="collapseEvidence" class="accordion-collapse collapse" aria-labelledby="headingEvidence" data-bs-parent="#specAccordion">
+              <div class="accordion-body px-0 py-3">
+                <p style="font-size:0.75rem; color:var(--text-muted);">Evidence records such as SOC 2, ISO certificates, or pen test summaries.</p>
+                <div style="padding:0.5rem 0.75rem; background:var(--bg-elevated); border-radius:var(--radius-sm); font-family:var(--font-mono); font-size:0.68rem; color:var(--accent-bright); margin-bottom:0.5rem;">
+                  vendor_id, evidence_name, evidence_type, related_domain, evidence_description, evidence_status, evidence_date, expiration_date, evidence_owner, file_path_or_link, reviewer_notes
+                </div>
+                <ul style="font-size:0.72rem; padding-left:1rem; color:var(--text-muted); margin:0;">
+                  <li><strong style="color:var(--text-secondary);">vendor_id</strong>: Required (Integer)</li>
+                  <li><strong style="color:var(--text-secondary);">evidence_type</strong>: SOC 2 Type II, ISO 27001, Pen Test, etc.</li>
+                  <li><strong style="color:var(--text-secondary);">evidence_status</strong>: Available, Accepted, Missing, Outdated, Expired</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card animate-fade-in mb-4">
+  <div class="card-header card-header-subtle">
+    <i class="bi bi-cloud-download-fill me-2"></i>Download Sample CSV Templates
+  </div>
+  <div class="card-body">
+    <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:0.75rem;">Download template files containing columns and mock headers to kickstart your data imports.</p>
+    <div class="d-flex flex-wrap gap-3">
+      <a href="/static/templates/vendors_template.csv" download class="btn btn-sm btn-outline-primary d-flex align-items-center">
+        <i class="bi bi-file-earmark-spreadsheet me-2"></i> Vendors Template
+      </a>
+      <a href="/static/templates/questionnaire_template.csv" download class="btn btn-sm btn-outline-primary d-flex align-items-center">
+        <i class="bi bi-file-earmark-spreadsheet me-2"></i> Questionnaire Template
+      </a>
+      <a href="/static/templates/evidence_template.csv" download class="btn btn-sm btn-outline-primary d-flex align-items-center">
+        <i class="bi bi-file-earmark-spreadsheet me-2"></i> Evidence Template
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

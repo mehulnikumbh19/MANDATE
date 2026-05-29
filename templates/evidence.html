@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Evidence Tracker{% endblock %}
+{% block page_title %}Evidence Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+  <h1 class="page-title"><i class="bi bi-folder-fill"></i>Evidence Tracker</h1>
+  <p class="page-subtitle">{{ evidence|length }} evidence record(s) — missing, expired, and outdated evidence highlighted.</p>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+  <div class="card-body" style="padding:1rem 1.25rem;">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label">Search</label>
+        <input type="text" class="form-control form-control-sm" name="q"
+               placeholder="Evidence name or vendor…"
+               value="{{ filters.get('q','') }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Evidence Status</label>
+        <select class="form-select form-select-sm" name="ev_status">
+          <option value="">All</option>
+          {% for s in ['Available','Missing','Incomplete','Outdated','Expired','Needs Review','Accepted'] %}
+          <option value="{{ s }}" {% if filters.get('ev_status') == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Evidence Type</label>
+        <select class="form-select form-select-sm" name="ev_type">
+          <option value="">All Types</option>
+          {% for t in ev_types %}
+          <option value="{{ t }}" {% if filters.get('ev_type') == t %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Vendor</label>
+        <select class="form-select form-select-sm" name="vendor_id">
+          <option value="">All Vendors</option>
+          {% for v in vendors %}
+          <option value="{{ v.id }}" {% if filters.get('vendor_id')|string == v.id|string %}selected{% endif %}>{{ v.vendor_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary btn-sm w-100">Filter</button>
+      </div>
+    </form>
+    <div class="mt-2 d-flex gap-2 flex-wrap">
+      <a href="?ev_status=Missing" class="badge-pill-filter"><i class="bi bi-x-circle-fill me-1" style="color:var(--red)"></i>Missing</a>
+      <a href="?ev_status=Expired" class="badge-pill-filter"><i class="bi bi-dash-circle-fill me-1" style="color:var(--text-muted)"></i>Expired</a>
+      <a href="?ev_status=Outdated" class="badge-pill-filter"><i class="bi bi-exclamation-circle-fill me-1" style="color:var(--orange)"></i>Outdated</a>
+      <a href="{{ url_for('evidence_list') }}" class="badge-pill-filter"><i class="bi bi-x-circle me-1"></i>Clear</a>
+    </div>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Vendor</th>
+            <th>Evidence Name</th>
+            <th>Type</th>
+            <th>Domain</th>
+            <th>Status</th>
+            <th>Evidence Date</th>
+            <th>Expiration</th>
+            <th>Owner</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set esmap = {'Available':'success','Missing':'danger','Outdated':'warning','Expired':'dark','Incomplete':'warning','Needs Review':'info','Accepted':'success'} %}
+          {% for e in evidence %}
+          <tr class="{% if e.evidence_status == 'Missing' %}table-danger-subtle{% elif e.evidence_status in ['Outdated','Expired','Incomplete'] %}table-warning-subtle{% endif %}">
+            <td>
+              <a href="{{ url_for('vendor_detail', vendor_id=e.vendor_id) }}" style="color:var(--accent-bright); font-weight:600; font-size:0.78rem;">
+                {{ e.vendor.vendor_name }}
+              </a>
+            </td>
+            <td style="font-size:0.78rem; font-weight:600; color:var(--text-bright);">{{ e.evidence_name }}</td>
+            <td><span class="badge bg-secondary-subtle text-secondary" style="border:1px solid rgba(255,255,255,0.06); font-size:0.65rem;">{{ e.evidence_type }}</span></td>
+            <td style="font-size:0.75rem; color:var(--text-muted);">{{ e.related_domain or '—' }}</td>
+            <td><span class="badge bg-{{ esmap.get(e.evidence_status,'secondary') }}">{{ e.evidence_status }}</span></td>
+            <td style="font-size:0.75rem; font-family:var(--font-mono); color:var(--text-muted);">{{ e.evidence_date.strftime('%Y-%m-%d') if e.evidence_date else '—' }}</td>
+            <td style="font-size:0.75rem; font-family:var(--font-mono); {% if e.expiration_date and e.expiration_date < today %}color:var(--red); font-weight:700;{% else %}color:var(--text-muted);{% endif %}">
+              {{ e.expiration_date.strftime('%Y-%m-%d') if e.expiration_date else '—' }}
+            </td>
+            <td style="font-size:0.75rem; color:var(--text-muted);">{{ e.evidence_owner or '—' }}</td>
+            <td style="font-size:0.75rem; color:var(--text-muted); max-width:160px;">{{ e.reviewer_notes[:60] if e.reviewer_notes else '—' }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="9" style="text-align:center; color:var(--text-muted); padding:3rem;">
+              <i class="bi bi-inbox" style="font-size:1.5rem; display:block; margin-bottom:0.5rem;"></i>
+              No evidence records found.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

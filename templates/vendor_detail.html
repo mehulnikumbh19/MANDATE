@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+{% block title %}{{ vendor.vendor_name }}{% endblock %}
+{% block page_title %}{{ vendor.vendor_name }}{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4 d-flex align-items-start justify-content-between flex-wrap gap-2">
+  <div>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb small mb-1">
+        <li class="breadcrumb-item"><a href="{{ url_for('vendors') }}">Vendors</a></li>
+        <li class="breadcrumb-item active">{{ vendor.vendor_name }}</li>
+      </ol>
+    </nav>
+    <h1 class="page-title"><i class="bi bi-building-fill"></i>{{ vendor.vendor_name }}</h1>
+    <div class="d-flex gap-2 flex-wrap mt-1">
+      <span class="badge bg-secondary-subtle text-secondary" style="border:1px solid rgba(255,255,255,0.06)">{{ vendor.vendor_category }}</span>
+      <span class="badge bg-{{ risk_badge.get(vendor.criticality,'secondary') }}-subtle text-{{ risk_badge.get(vendor.criticality,'secondary') }}" style="border:1px solid rgba(255,255,255,0.06)">
+        {{ vendor.criticality }} Criticality
+      </span>
+      <span class="badge bg-{{ status_badge.get(vendor.review_status,'secondary') }}-subtle text-{{ status_badge.get(vendor.review_status,'secondary') }}" style="border:1px solid rgba(255,255,255,0.06)">
+        {{ vendor.review_status }}
+      </span>
+      {% if vendor.phi_involved %}<span class="badge bg-danger">PHI</span>{% endif %}
+      {% if vendor.payment_data %}<span class="badge bg-warning">Payment Data</span>{% endif %}
+      {% if vendor.pii_involved %}<span class="badge bg-info">PII</span>{% endif %}
+    </div>
+  </div>
+  <a href="{{ url_for('vendor_edit', vendor_id=vendor.id) }}" class="btn btn-outline-primary btn-sm">
+    <i class="bi bi-pencil me-1"></i>Edit Vendor
+  </a>
+</div>
+
+<!-- ===== EVIDENCE GAPS ALERT ===== -->
+{% if evidence_gaps %}
+<div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+  <i class="bi bi-exclamation-triangle-fill fs-5 mt-1" style="color:var(--red)"></i>
+  <div>
+    <strong style="color:var(--red)">Evidence Gaps Detected</strong>
+    <ul class="mb-0 mt-1" style="color:var(--text-secondary)">
+      {% for gap in evidence_gaps %}
+      <li>{{ gap }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endif %}
+
+<!-- ===== VENDOR INFO ===== -->
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header card-header-subtle"><i class="bi bi-info-circle-fill me-2"></i>Vendor Details</div>
+      <div class="card-body">
+        <dl class="row mb-0" style="font-size:0.82rem;">
+          <dt class="col-sm-5">Business Owner</dt><dd class="col-sm-7">{{ vendor.business_owner or '—' }}</dd>
+          <dt class="col-sm-5">Security Reviewer</dt><dd class="col-sm-7">{{ vendor.security_reviewer or '—' }}</dd>
+          <dt class="col-sm-5">Department</dt><dd class="col-sm-7">{{ vendor.department or '—' }}</dd>
+          <dt class="col-sm-5">System Supported</dt><dd class="col-sm-7">{{ vendor.system_supported or '—' }}</dd>
+          <dt class="col-sm-5">Service Description</dt>
+          <dd class="col-sm-7">{{ vendor.service_description or '—' }}</dd>
+          <dt class="col-sm-5">Cloud Hosted</dt><dd class="col-sm-7">{{ 'Yes' if vendor.cloud_hosted else 'No' }}</dd>
+          <dt class="col-sm-5">Country/Region</dt><dd class="col-sm-7">{{ vendor.country_region or '—' }}</dd>
+          <dt class="col-sm-5">Onboarding Date</dt>
+          <dd class="col-sm-7" style="font-family:var(--font-mono);">{{ vendor.onboarding_date.strftime('%Y-%m-%d') if vendor.onboarding_date else '—' }}</dd>
+          <dt class="col-sm-5">Last Review</dt>
+          <dd class="col-sm-7" style="font-family:var(--font-mono);">{{ vendor.last_review_date.strftime('%Y-%m-%d') if vendor.last_review_date else '—' }}</dd>
+          <dt class="col-sm-5">Next Review</dt>
+          <dd class="col-sm-7 {% if vendor.next_review_date and vendor.next_review_date < today %}{% endif %}" style="font-family:var(--font-mono); {% if vendor.next_review_date and vendor.next_review_date < today %}color:var(--red); font-weight:700;{% endif %}">
+            {{ vendor.next_review_date.strftime('%Y-%m-%d') if vendor.next_review_date else '—' }}
+          </dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header card-header-subtle"><i class="bi bi-shield-fill-check me-2"></i>Risk Summary</div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="kpi-card kpi-sm">
+              <div class="kpi-label">Inherent Risk</div>
+              <div class="kpi-value" style="font-size:1rem;">
+                <span class="badge bg-{{ risk_badge.get(vendor.inherent_risk,'secondary') }}" style="font-size:0.82rem;">
+                  {{ vendor.inherent_risk or '—' }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="kpi-card kpi-sm">
+              <div class="kpi-label">Residual Risk</div>
+              <div class="kpi-value" style="font-size:1rem;">
+                <span class="badge bg-{{ risk_badge.get(vendor.residual_risk,'secondary') }}" style="font-size:0.82rem;">
+                  {{ vendor.residual_risk or '—' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr/>
+        <dl class="row mb-0" style="font-size:0.82rem;">
+          <dt class="col-sm-5">Data Types</dt><dd class="col-sm-7">{{ vendor.data_types_processed or '—' }}</dd>
+          <dt class="col-sm-5">Sensitive Data</dt><dd class="col-sm-7">{{ 'Yes' if vendor.sensitive_data else 'No' }}</dd>
+          <dt class="col-sm-5">PHI Involved</dt>
+          <dd class="col-sm-7">
+            {% if vendor.phi_involved %}<span style="color:var(--red); font-weight:700;">Yes</span>{% else %}No{% endif %}
+          </dd>
+          <dt class="col-sm-5">Payment Data</dt>
+          <dd class="col-sm-7">
+            {% if vendor.payment_data %}<span style="color:var(--orange); font-weight:700;">Yes</span>{% else %}No{% endif %}
+          </dd>
+          <dt class="col-sm-5">PII Involved</dt><dd class="col-sm-7">{{ 'Yes' if vendor.pii_involved else 'No' }}</dd>
+          <dt class="col-sm-5">Approval Status</dt>
+          <dd class="col-sm-7">
+            <span class="badge bg-{{ status_badge.get(vendor.approval_status,'secondary') }}-subtle text-{{ status_badge.get(vendor.approval_status,'secondary') }}" style="border:1px solid rgba(255,255,255,0.06)">
+              {{ vendor.approval_status }}
+            </span>
+          </dd>
+        </dl>
+        {% if vendor.notes %}
+        <div style="margin-top:0.75rem; padding:0.6rem 0.85rem; background:var(--bg-elevated); border-radius:var(--radius-sm); border-left:3px solid var(--orange); font-size:0.78rem; color:var(--text-secondary);">
+          <strong style="color:var(--orange);">Notes:</strong> {{ vendor.notes }}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== QUESTIONNAIRE REVIEWS ===== -->
+<div class="card mb-4">
+  <div class="card-header card-header-subtle d-flex justify-content-between">
+    <span><i class="bi bi-clipboard2-check-fill me-2"></i>Questionnaire Responses ({{ qrs|length }})</span>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm table-hover mb-0">
+        <thead>
+          <tr><th>Domain</th><th>Question</th><th>Quality</th><th>Risk Flag</th><th>Follow-Up?</th></tr>
+        </thead>
+        <tbody>
+          {% for q in qrs %}
+          <tr>
+            <td><span class="badge bg-secondary-subtle text-secondary" style="border:1px solid rgba(255,255,255,0.06); font-size:0.68rem;">{{ q.domain }}</span></td>
+            <td><div style="font-size:0.78rem; color:var(--text-primary);">{{ q.question_text }}</div>
+              {% if q.vendor_response %}
+              <div style="color:var(--text-muted); font-size:0.72rem; margin-top:0.25rem; font-style:italic;">"{{ q.vendor_response[:120] }}{% if q.vendor_response|length > 120 %}…{% endif %}"</div>
+              {% endif %}
+              {% if q.analyst_notes %}
+              <div style="color:var(--orange); font-size:0.72rem; margin-top:0.25rem;"><i class="bi bi-sticky-fill me-1"></i>{{ q.analyst_notes }}</div>
+              {% endif %}
+            </td>
+            <td>
+              {% set qmap = {'Acceptable':'success','Incomplete':'warning','Vague':'warning','Missing':'danger','High Risk':'danger','Needs Evidence':'info'} %}
+              <span class="badge bg-{{ qmap.get(q.response_quality,'secondary') }}">{{ q.response_quality or '—' }}</span>
+            </td>
+            <td><span class="badge bg-{{ risk_badge.get(q.risk_flag,'secondary') }}">{{ q.risk_flag or 'None' }}</span></td>
+            <td>
+              {% if q.follow_up_required %}
+              <span class="badge bg-warning-subtle text-warning" style="border:1px solid rgba(255,255,255,0.06)"><i class="bi bi-flag-fill me-1"></i>Yes</span>
+              {% else %}
+              <span style="color:var(--text-muted); font-size:0.72rem;">—</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:2rem;">No questionnaire responses yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EVIDENCE ===== -->
+<div class="card mb-4">
+  <div class="card-header card-header-subtle">
+    <i class="bi bi-folder-fill me-2"></i>Evidence Records ({{ evidence|length }})
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm table-hover mb-0">
+        <thead>
+          <tr><th>Evidence</th><th>Type</th><th>Status</th><th>Date</th><th>Expires</th></tr>
+        </thead>
+        <tbody>
+          {% for e in evidence %}
+          {% set esmap = {'Available':'success','Missing':'danger','Outdated':'warning','Expired':'dark','Incomplete':'warning','Needs Review':'info','Accepted':'success'} %}
+          <tr>
+            <td style="font-size:0.78rem; font-weight:600; color:var(--text-bright);">{{ e.evidence_name }}</td>
+            <td style="font-size:0.78rem; color:var(--text-muted);">{{ e.evidence_type }}</td>
+            <td><span class="badge bg-{{ esmap.get(e.evidence_status,'secondary') }}">{{ e.evidence_status }}</span></td>
+            <td style="font-size:0.75rem; font-family:var(--font-mono); color:var(--text-muted);">{{ e.evidence_date.strftime('%Y-%m-%d') if e.evidence_date else '—' }}</td>
+            <td style="font-size:0.75rem; font-family:var(--font-mono); {% if e.expiration_date and e.expiration_date < today %}color:var(--red); font-weight:700;{% else %}color:var(--text-muted);{% endif %}">
+              {{ e.expiration_date.strftime('%Y-%m-%d') if e.expiration_date else '—' }}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:2rem;">No evidence records.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RISK ASSESSMENTS + FOLLOW-UPS ===== -->
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header card-header-subtle">
+        <i class="bi bi-graph-up-arrow me-2"></i>Risk Assessments ({{ risk_assessments|length }})
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-sm table-hover mb-0">
+            <thead>
+              <tr><th>Date</th><th>Inherent</th><th>Residual</th><th>Decision</th></tr>
+            </thead>
+            <tbody>
+              {% for ra in risk_assessments %}
+              <tr>
+                <td style="font-size:0.75rem; font-family:var(--font-mono); color:var(--text-muted);">{{ ra.assessment_date.strftime('%Y-%m-%d') if ra.assessment_date else '—' }}</td>
+                <td><span class="badge bg-{{ risk_badge.get(ra.inherent_risk_rating,'secondary') }}">{{ ra.inherent_risk_rating }}</span></td>
+                <td><span class="badge bg-{{ risk_badge.get(ra.residual_risk_rating,'secondary') }}">{{ ra.residual_risk_rating }}</span></td>
+                <td style="font-size:0.78rem; color:var(--text-secondary);">{{ ra.risk_decision or '—' }}</td>
+              </tr>
+              {% else %}
+              <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:2rem;">No risk assessments.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header card-header-subtle">
+        <i class="bi bi-chat-left-dots-fill me-2"></i>Follow-Ups ({{ follow_ups|length }})
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-sm table-hover mb-0">
+            <thead>
+              <tr><th>Question</th><th>Due</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              {% for fu in follow_ups %}
+              <tr>
+                <td style="font-size:0.78rem; color:var(--text-secondary);">{{ fu.follow_up_question[:60] }}{% if fu.follow_up_question|length > 60 %}…{% endif %}</td>
+                <td style="font-size:0.75rem; font-family:var(--font-mono); {% if fu.due_date and fu.due_date < today and fu.status != 'Closed' %}color:var(--red); font-weight:700;{% else %}color:var(--text-muted);{% endif %}">
+                  {{ fu.due_date.strftime('%Y-%m-%d') if fu.due_date else '—' }}
+                </td>
+                <td>
+                  {% set fumap = {'Open':'warning','Overdue':'danger','Closed':'success','Sent to Vendor':'info','Vendor Responded':'primary'} %}
+                  <span class="badge bg-{{ fumap.get(fu.status,'secondary') }}">{{ fu.status }}</span>
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="3" style="text-align:center; color:var(--text-muted); padding:2rem;">No follow-ups.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== APPROVALS ===== -->
+{% if approvals %}
+<div class="card mb-4">
+  <div class="card-header card-header-subtle">
+    <i class="bi bi-patch-check-fill me-2"></i>Approval Records
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm table-hover mb-0">
+        <thead>
+          <tr><th>Decision</th><th>Status</th><th>Exception</th><th>Owner</th><th>Expires</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          {% for ap in approvals %}
+          <tr>
+            <td style="font-size:0.78rem; color:var(--text-secondary);">{{ ap.risk_decision }}</td>
+            <td><span class="badge bg-{{ status_badge.get(ap.approval_status,'secondary') }}-subtle text-{{ status_badge.get(ap.approval_status,'secondary') }}" style="border:1px solid rgba(255,255,255,0.06)">{{ ap.approval_status }}</span></td>
+            <td style="font-size:0.78rem; color:var(--text-secondary);">{{ 'Yes – ' + ap.exception_reason[:40] if ap.exception_required and ap.exception_reason else ('Yes' if ap.exception_required else 'No') }}</td>
+            <td style="font-size:0.78rem; color:var(--text-muted);">{{ ap.risk_acceptance_owner }}</td>
+            <td style="font-size:0.75rem; font-family:var(--font-mono); {% if ap.expiration_date and ap.expiration_date < today %}color:var(--red); font-weight:700;{% else %}color:var(--text-muted);{% endif %}">
+              {{ ap.expiration_date.strftime('%Y-%m-%d') if ap.expiration_date else '—' }}
+            </td>
+            <td style="font-size:0.78rem; color:var(--text-muted); max-width:160px;">{{ ap.notes[:60] if ap.notes else '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

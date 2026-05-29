@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}New Risk Assessment{% endblock %}
+{% block page_title %}New Risk Assessment{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb small mb-1">
+      <li class="breadcrumb-item"><a href="{{ url_for('risk_assessments') }}">Risk Assessments</a></li>
+      <li class="breadcrumb-item active">New</li>
+    </ol>
+  </nav>
+  <h1 class="page-title"><i class="bi bi-bar-chart-line me-2"></i>New Risk Assessment</h1>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <form method="post">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold small">Vendor <span class="text-danger">*</span></label>
+          <select class="form-select" name="vendor_id" required>
+            <option value="">— Select Vendor —</option>
+            {% for v in vendors %}
+            <option value="{{ v.id }}">{{ v.vendor_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold small">Assessment Date</label>
+          <input type="date" class="form-control" name="assessment_date">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold small">Assessor</label>
+          <input type="text" class="form-control" name="assessor" placeholder="Your name">
+        </div>
+
+        <!-- Inherent Risk -->
+        <div class="col-12"><h6 class="text-muted border-bottom pb-1 mt-2">Inherent Risk</h6></div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold small">Likelihood (1–5)</label>
+          <input type="number" class="form-control" name="inherent_likelihood" min="1" max="5" value="3">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold small">Impact (1–5)</label>
+          <input type="number" class="form-control" name="inherent_impact" min="1" max="5" value="3">
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold small">Key Risk Drivers</label>
+          <textarea class="form-control" name="key_risk_drivers" rows="2"
+                    placeholder="e.g. Handles PHI, Missing SOC 2, No formal IR plan"></textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold small">Existing Controls</label>
+          <textarea class="form-control" name="existing_controls" rows="2"></textarea>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold small">Control Gaps</label>
+          <textarea class="form-control" name="control_gaps" rows="2"></textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold small">Compensating Controls</label>
+          <textarea class="form-control" name="compensating_controls" rows="2"></textarea>
+        </div>
+
+        <!-- Residual Risk -->
+        <div class="col-12"><h6 class="text-muted border-bottom pb-1 mt-2">Residual Risk</h6></div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold small">Residual Likelihood (1–5)</label>
+          <input type="number" class="form-control" name="residual_likelihood" min="1" max="5" value="2">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold small">Residual Impact (1–5)</label>
+          <input type="number" class="form-control" name="residual_impact" min="1" max="5" value="3">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold small">Risk Decision</label>
+          <select class="form-select" name="risk_decision">
+            {% for d in ['Approve','Approve with Conditions','Request More Evidence','Require Remediation','Escalate','Reject','Accept Risk'] %}
+            <option value="{{ d }}">{{ d }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold small">Risk Owner</label>
+          <input type="text" class="form-control" name="risk_owner">
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="approval_required" name="approval_required">
+            <label class="form-check-label small fw-semibold" for="approval_required">Approval Required</label>
+          </div>
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-semibold small">Notes</label>
+          <textarea class="form-control" name="notes" rows="2"></textarea>
+        </div>
+      </div>
+
+      <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-save me-1"></i>Save Assessment
+        </button>
+        <a href="{{ url_for('risk_assessments') }}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

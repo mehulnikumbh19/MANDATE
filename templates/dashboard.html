@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Command Center{% endblock %}
+
+{% block content %}
+<!-- ===== PAGE HEADER ===== -->
+<div class="page-header mb-4 d-flex align-items-start justify-content-between flex-wrap gap-3">
+  <div>
+    <h1 class="page-title"><i class="bi bi-grid-1x2-fill"></i>Third-Party Risk Command Center</h1>
+    <p class="page-subtitle">Real-time posture overview · Vendor risk pipeline · Evidence gap analysis · Control domain weakness mapping</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('assessor_guide') }}" class="btn btn-outline-primary btn-sm px-3">
+      <i class="bi bi-journal-bookmark-fill me-1"></i>Assessor Playbook
+    </a>
+    <a href="{{ url_for('vendors') }}" class="btn btn-primary btn-sm px-3">
+      <i class="bi bi-building-fill me-1"></i>Vendor Inventory
+    </a>
+  </div>
+</div>
+
+<!-- ===== COMMAND BAR ===== -->
+<div class="command-bar mb-4 animate-fade-in">
+  <div class="command-bar-status">
+    <span class="status-dot live"></span>
+    <span style="color:var(--accent-bright); font-weight:700; font-family:var(--font-mono);">{{ stats.total_vendors }}</span>
+    <span>vendors tracked</span>
+    <span style="color:var(--border-default);">|</span>
+    <span style="color:var(--red); font-weight:700; font-family:var(--font-mono);">{{ stats.high_risk_responses }}</span>
+    <span>high-risk responses</span>
+    <span style="color:var(--border-default);">|</span>
+    <span style="color:var(--orange); font-weight:700; font-family:var(--font-mono);">{{ stats.missing_evidence }}</span>
+    <span>evidence gaps</span>
+    <span style="color:var(--border-default);">|</span>
+    <span style="color:var(--red); font-weight:700; font-family:var(--font-mono);">{{ stats.overdue_followups }}</span>
+    <span>overdue items</span>
+  </div>
+</div>
+
+<!-- ===== SECTION: PRIMARY METRICS ===== -->
+<div class="section-label">Threat Posture Overview</div>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="kpi-card">
+      <div class="kpi-icon icon-teal"><i class="bi bi-building-fill"></i></div>
+      <div class="kpi-value">{{ stats.total_vendors }}</div>
+      <div class="kpi-label">Total Vendors</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="kpi-card">
+      <div class="kpi-icon icon-red"><i class="bi bi-exclamation-triangle-fill"></i></div>
+      <div class="kpi-value" style="color:var(--red)">{{ (stats.risk_counts.get('High',0) + stats.risk_counts.get('Critical',0)) }}</div>
+      <div class="kpi-label">High / Critical Risk</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="kpi-card">
+      <div class="kpi-icon icon-orange"><i class="bi bi-folder-x"></i></div>
+      <div class="kpi-value" style="color:var(--orange)">{{ stats.missing_evidence }}</div>
+      <div class="kpi-label">Missing Evidence</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="kpi-card">
+      <div class="kpi-icon icon-cyan"><i class="bi bi-clock-history"></i></div>
+      <div class="kpi-value" style="color:var(--cyan)">{{ stats.outdated_evidence }}</div>
+      <div class="kpi-label">Outdated Evidence</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECTION: DATA EXPOSURE ===== -->
+<div class="section-label">Sensitive Data Exposure</div>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="kpi-card">
+      <div class="kpi-icon icon-red"><i class="bi bi-shield-x"></i></div>
+      <div class="kpi-value" style="color:var(--red)">{{ stats.high_risk_responses }}</div>
+      <div class="kpi-label">High-Risk Responses</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="kpi-card">
+      <div class="kpi-icon icon-purple"><i class="bi bi-heart-pulse-fill"></i></div>
+      <div class="kpi-value" style="color:var(--purple)">{{ stats.vendors_phi }}</div>
+      <div class="kpi-label">PHI Vendors</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="kpi-card">
+      <div class="kpi-icon icon-orange"><i class="bi bi-credit-card-fill"></i></div>
+      <div class="kpi-value" style="color:var(--orange)">{{ stats.vendors_payment }}</div>
+      <div class="kpi-label">Payment Data Vendors</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="kpi-card">
+      <div class="kpi-icon icon-blue"><i class="bi bi-database-fill-lock"></i></div>
+      <div class="kpi-value" style="color:var(--blue)">{{ stats.vendors_sensitive }}</div>
+      <div class="kpi-label">Sensitive Data Vendors</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECTION: PIPELINE STATUS ===== -->
+<div class="section-label">Review Pipeline</div>
+<div class="dash-grid-6 mb-4">
+  <div class="kpi-card kpi-sm">
+    <div class="kpi-value" style="color:var(--orange)">{{ stats.open_followups }}</div>
+    <div class="kpi-label">Open Follow-Ups</div>
+  </div>
+  <div class="kpi-card kpi-sm" style="border-color:rgba(239,68,68,0.3)">
+    <div class="kpi-value" style="color:var(--red)">{{ stats.overdue_followups }}</div>
+    <div class="kpi-label">Overdue</div>
+  </div>
+  <div class="kpi-card kpi-sm">
+    <div class="kpi-value" style="color:var(--blue)">{{ stats.pending_approvals }}</div>
+    <div class="kpi-label">Pending Approval</div>
+  </div>
+  <div class="kpi-card kpi-sm">
+    <div class="kpi-value" style="color:var(--green)">{{ stats.approved_count }}</div>
+    <div class="kpi-label">Approved</div>
+  </div>
+  <div class="kpi-card kpi-sm">
+    <div class="kpi-value" style="color:var(--red)">{{ stats.rejected_count }}</div>
+    <div class="kpi-label">Rejected</div>
+  </div>
+  <div class="kpi-card kpi-sm" style="border-color:rgba(245,158,11,0.3)">
+    <div class="kpi-value" style="color:var(--orange)">{{ stats.expired_exceptions }}</div>
+    <div class="kpi-label">Expired Exceptions</div>
+  </div>
+</div>
+
+<!-- ===== SECTION: CHARTS ===== -->
+<div class="section-label">Analytics</div>
+<div class="row g-3 mb-4">
+  <div class="col-lg-4">
+    <div class="chart-panel">
+      <div class="chart-panel-header">
+        <i class="bi bi-pie-chart-fill"></i>Risk Distribution
+      </div>
+      <div class="chart-panel-body">
+        <canvas id="riskChart" width="260" height="260"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="chart-panel">
+      <div class="chart-panel-header">
+        <i class="bi bi-bar-chart-fill"></i>Review Status
+      </div>
+      <div class="chart-panel-body">
+        <canvas id="statusChart" width="260" height="260"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="chart-panel">
+      <div class="chart-panel-header">
+        <i class="bi bi-shield-exclamation"></i>Control Domain Weaknesses
+      </div>
+      <div class="chart-panel-body" style="flex-direction:column; align-items:stretch; justify-content:flex-start; padding:1.25rem;">
+        {% if stats.domain_flags %}
+          {% for domain, count in stats.domain_flags.items() | sort(attribute=1, reverse=True) %}
+          <div class="domain-bar">
+            <div class="domain-bar-label">
+              <span class="domain-bar-name">{{ domain }}</span>
+              <span class="domain-bar-count">{{ count }}</span>
+            </div>
+            <div class="domain-bar-track">
+              <div class="domain-bar-fill" style="width:{{ [count * 20, 100]|min }}%"></div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p style="color:var(--text-muted); font-size:0.82rem;">No high-risk flags recorded.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECTION: RISK SUMMARY TABLES ===== -->
+<div class="section-label">Intelligence Summary</div>
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header card-header-subtle">
+        <i class="bi bi-exclamation-octagon me-2"></i>Risk Level Breakdown
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <thead>
+            <tr><th>Risk Level</th><th>Vendors</th><th>Distribution</th></tr>
+          </thead>
+          <tbody>
+            {% for level, color in [('Critical','danger'),('High','warning'),('Medium','info'),('Low','success')] %}
+            <tr>
+              <td><span class="badge bg-{{ color }}">{{ level }}</span></td>
+              <td style="font-family:var(--font-mono); font-weight:700; color:var(--text-bright)">{{ stats.risk_counts.get(level, 0) }}</td>
+              <td>
+                <div class="progress" style="height:6px; width:140px;">
+                  <div class="progress-bar bg-{{ color }}"
+                       style="width:{{ ((stats.risk_counts.get(level, 0) / [stats.total_vendors, 1]|max) * 100)|round|int }}%"></div>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header card-header-subtle d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-list-check me-2"></i>Review Status Pipeline</span>
+        <a href="{{ url_for('vendors') }}" class="btn btn-outline-primary btn-sm" style="font-size:0.7rem;">View All</a>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <thead>
+            <tr><th>Status</th><th>Count</th></tr>
+          </thead>
+          <tbody>
+            {% for status, count in stats.status_counts.items() | sort %}
+            <tr>
+              <td>
+                <span class="badge bg-{{ status_badge.get(status, 'secondary') }}-subtle text-{{ status_badge.get(status, 'secondary') }}" style="border:1px solid rgba(255,255,255,0.06)">
+                  {{ status }}
+                </span>
+              </td>
+              <td style="font-family:var(--font-mono); font-weight:700; color:var(--text-bright)">{{ count }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Pass stats data to charts.js
+  window.MANDATE_STATS = {
+    riskLabels: {{ stats.risk_counts.keys() | list | tojson }},
+    riskData:   {{ stats.risk_counts.values() | list | tojson }},
+    statusLabels: {{ stats.status_counts.keys() | list | tojson }},
+    statusData:   {{ stats.status_counts.values() | list | tojson }},
+  };
+  initDashboardCharts();
+</script>
+{% endblock %}

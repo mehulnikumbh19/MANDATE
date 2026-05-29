@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% block title %}Vendor Inventory{% endblock %}
+{% block page_title %}Vendor Inventory{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4 d-flex align-items-center justify-content-between flex-wrap gap-2">
+  <div>
+    <h1 class="page-title"><i class="bi bi-building-fill"></i>Vendor Inventory</h1>
+    <p class="page-subtitle">{{ vendors|length }} third-party vendor(s) under active security review.</p>
+  </div>
+  <a href="{{ url_for('vendor_new') }}" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus-circle me-1"></i>Add Vendor
+  </a>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+  <div class="card-body" style="padding:1rem 1.25rem;">
+    <form method="get" class="row g-2 align-items-end" id="vendor-filter-form">
+      <div class="col-md-3">
+        <label class="form-label">Search</label>
+        <input type="text" class="form-control form-control-sm" name="q"
+               placeholder="Vendor name, owner, description…"
+               value="{{ filters.get('q','') }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Category</label>
+        <select class="form-select form-select-sm" name="category">
+          <option value="">All Categories</option>
+          {% for cat in categories %}
+          <option value="{{ cat }}" {% if filters.get('category') == cat %}selected{% endif %}>{{ cat }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Criticality</label>
+        <select class="form-select form-select-sm" name="criticality">
+          <option value="">All</option>
+          {% for c in ['Critical','High','Medium','Low'] %}
+          <option value="{{ c }}" {% if filters.get('criticality') == c %}selected{% endif %}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Residual Risk</label>
+        <select class="form-select form-select-sm" name="risk">
+          <option value="">All</option>
+          {% for r in ['Critical','High','Medium','Low'] %}
+          <option value="{{ r }}" {% if filters.get('risk') == r %}selected{% endif %}>{{ r }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Review Status</label>
+        <select class="form-select form-select-sm" name="review_status">
+          <option value="">All</option>
+          {% for s in ['Not Started','In Review','Pending Evidence','Approved','Rejected'] %}
+          <option value="{{ s }}" {% if filters.get('review_status') == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-1">
+        <button type="submit" class="btn btn-primary btn-sm w-100">Filter</button>
+      </div>
+    </form>
+    <div class="mt-2 d-flex gap-2 flex-wrap">
+      <a href="?phi=yes" class="badge-pill-filter {% if filters.get('phi') == 'yes' %}active{% endif %}">
+        <i class="bi bi-heart-pulse-fill me-1"></i>PHI Only
+      </a>
+      <a href="?payment=yes" class="badge-pill-filter {% if filters.get('payment') == 'yes' %}active{% endif %}">
+        <i class="bi bi-credit-card-fill me-1"></i>Payment Only
+      </a>
+      <a href="?review_status=Pending+Evidence" class="badge-pill-filter">
+        <i class="bi bi-folder-x me-1"></i>Pending Evidence
+      </a>
+      <a href="{{ url_for('vendors') }}" class="badge-pill-filter">
+        <i class="bi bi-x-circle me-1"></i>Clear Filters
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Vendor</th>
+            <th>Category</th>
+            <th>Data Types</th>
+            <th>Criticality</th>
+            <th>Inherent Risk</th>
+            <th>Residual Risk</th>
+            <th>Review Status</th>
+            <th>Next Review</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for v in vendors %}
+          <tr>
+            <td>
+              <div style="color:var(--text-bright); font-weight:600; font-size:0.82rem;">{{ v.vendor_name }}</div>
+              <div style="color:var(--text-muted); font-size:0.72rem;">{{ v.business_owner }}</div>
+            </td>
+            <td><span class="badge bg-secondary-subtle text-secondary" style="border:1px solid rgba(255,255,255,0.06)">{{ v.vendor_category }}</span></td>
+            <td>
+              <div class="d-flex gap-1 flex-wrap">
+                {% if v.phi_involved %}<span class="badge bg-danger">PHI</span>{% endif %}
+                {% if v.payment_data %}<span class="badge bg-warning">Payment</span>{% endif %}
+                {% if v.pii_involved %}<span class="badge bg-info">PII</span>{% endif %}
+                {% if not v.phi_involved and not v.payment_data and not v.pii_involved %}
+                  <span style="color:var(--text-muted); font-size:0.72rem;">Internal</span>
+                {% endif %}
+              </div>
+            </td>
+            <td>
+              <span class="badge bg-{{ risk_badge.get(v.criticality,'secondary') }}-subtle text-{{ risk_badge.get(v.criticality,'secondary') }}" style="border:1px solid rgba(255,255,255,0.06)">
+                {{ v.criticality or '—' }}
+              </span>
+            </td>
+            <td><span class="badge bg-{{ risk_badge.get(v.inherent_risk,'secondary') }}">{{ v.inherent_risk or '—' }}</span></td>
+            <td><span class="badge bg-{{ risk_badge.get(v.residual_risk,'secondary') }}">{{ v.residual_risk or '—' }}</span></td>
+            <td>
+              <span class="badge bg-{{ status_badge.get(v.review_status,'secondary') }}-subtle text-{{ status_badge.get(v.review_status,'secondary') }}" style="border:1px solid rgba(255,255,255,0.06); font-size:0.68rem;">
+                {{ v.review_status }}
+              </span>
+            </td>
+            <td>
+              <span style="font-size:0.75rem; font-family:var(--font-mono); {% if v.next_review_date and v.next_review_date < today %}color:var(--red); font-weight:700;{% else %}color:var(--text-muted);{% endif %}">
+                {{ v.next_review_date.strftime('%Y-%m-%d') if v.next_review_date else '—' }}
+              </span>
+            </td>
+            <td>
+              <a href="{{ url_for('vendor_detail', vendor_id=v.id) }}"
+                 class="btn btn-sm btn-outline-primary" style="padding:0.2rem 0.45rem;" title="View">
+                <i class="bi bi-eye"></i>
+              </a>
+              <a href="{{ url_for('vendor_edit', vendor_id=v.id) }}"
+                 class="btn btn-sm btn-outline-secondary ms-1" style="padding:0.2rem 0.45rem;" title="Edit">
+                <i class="bi bi-pencil"></i>
+              </a>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="9" style="text-align:center; color:var(--text-muted); padding:3rem;">
+              <i class="bi bi-inbox" style="font-size:1.5rem; display:block; margin-bottom:0.5rem; color:var(--text-muted);"></i>
+              No vendors match the current filters.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

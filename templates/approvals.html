@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Approvals & Exceptions{% endblock %}
+{% block page_title %}Approvals & Exceptions{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+  <h1 class="page-title"><i class="bi bi-patch-check-fill"></i>Approvals & Exceptions</h1>
+  <p class="page-subtitle">{{ approvals|length }} approval record(s) — exceptions and expirations flagged.</p>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+  <div class="card-body" style="padding:1rem 1.25rem;">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label">Approval Status</label>
+        <select class="form-select form-select-sm" name="status">
+          <option value="">All</option>
+          {% for s in ['Draft','Pending Approval','Approved','Approved with Exception','Rejected','Expired'] %}
+          <option value="{{ s }}" {% if filters.get('status') == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary btn-sm w-100">Filter</button>
+      </div>
+      <div class="col-md-auto ms-md-auto">
+        <div class="d-flex gap-2">
+          <a href="?status=Pending+Approval" class="badge-pill-filter"><i class="bi bi-clock-fill me-1" style="color:var(--blue)"></i>Pending</a>
+          <a href="?status=Approved+with+Exception" class="badge-pill-filter"><i class="bi bi-exclamation-triangle-fill me-1" style="color:var(--orange)"></i>With Exception</a>
+          <a href="?status=Expired" class="badge-pill-filter"><i class="bi bi-dash-circle-fill me-1" style="color:var(--text-muted)"></i>Expired</a>
+          <a href="{{ url_for('approvals') }}" class="badge-pill-filter"><i class="bi bi-x-circle me-1"></i>Clear</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Vendor</th>
+            <th>Risk Decision</th>
+            <th>Approval Status</th>
+            <th>Exception</th>
+            <th>Risk Owner</th>
+            <th>Approved</th>
+            <th>Expires</th>
+            <th>Next Review</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ap in approvals %}
+          <tr class="{% if ap.approval_status == 'Expired' %}table-dark-subtle{% elif ap.approval_status == 'Rejected' %}table-danger-subtle{% elif ap.exception_required %}table-warning-subtle{% endif %}">
+            <td>
+              <a href="{{ url_for('vendor_detail', vendor_id=ap.vendor_id) }}" style="color:var(--accent-bright); font-weight:600; font-size:0.78rem;">
+                {{ ap.vendor.vendor_name }}
+              </a>
+            </td>
+            <td style="font-size:0.78rem; color:var(--text-secondary);">{{ ap.risk_decision or '—' }}</td>
+            <td>
+              <span class="badge bg-{{ status_badge.get(ap.approval_status,'secondary') }}-subtle text-{{ status_badge.get(ap.approval_status,'secondary') }}" style="border:1px solid rgba(255,255,255,0.06)">
+                {{ ap.approval_status }}
+              </span>
+            </td>
+            <td>
+              {% if ap.exception_required %}
+              <span class="badge bg-warning-subtle text-warning" style="border:1px solid rgba(255,255,255,0.06)" title="{{ ap.exception_reason }}">
+                <i class="bi bi-shield-exclamation me-1"></i>Yes
+              </span>
+              {% if ap.compensating_controls %}
+              <div style="font-size:0.72rem; color:var(--text-muted); margin-top:0.25rem;">{{ ap.compensating_controls[:60] }}</div>
+              {% endif %}
+              {% else %}
+              <span style="color:var(--text-muted); font-size:0.72rem;">—</span>
+              {% endif %}
+            </td>
+            <td style="font-size:0.78rem; color:var(--text-muted);">{{ ap.risk_acceptance_owner or '—' }}</td>
+            <td style="font-size:0.75rem; font-family:var(--font-mono); color:var(--text-muted);">{{ ap.approval_date.strftime('%Y-%m-%d') if ap.approval_date else '—' }}</td>
+            <td style="font-size:0.75rem; font-family:var(--font-mono); {% if ap.expiration_date and ap.expiration_date < today %}color:var(--red); font-weight:700;{% else %}color:var(--text-muted);{% endif %}">
+              {{ ap.expiration_date.strftime('%Y-%m-%d') if ap.expiration_date else '—' }}
+              {% if ap.expiration_date and ap.expiration_date < today %}
+              <span class="badge bg-danger ms-1" style="font-size:0.6rem;">EXPIRED</span>
+              {% endif %}
+            </td>
+            <td style="font-size:0.75rem; font-family:var(--font-mono); color:var(--text-muted);">{{ ap.review_date.strftime('%Y-%m-%d') if ap.review_date else '—' }}</td>
+            <td style="font-size:0.75rem; color:var(--text-muted); max-width:160px;">{{ ap.notes[:60] if ap.notes else '—' }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="9" style="text-align:center; color:var(--text-muted); padding:3rem;">
+              <i class="bi bi-inbox" style="font-size:1.5rem; display:block; margin-bottom:0.5rem;"></i>
+              No approval records found.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Risk Assessments{% endblock %}
+{% block page_title %}Risk Assessments{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4 d-flex align-items-center justify-content-between flex-wrap gap-2">
+  <div>
+    <h1 class="page-title"><i class="bi bi-graph-up-arrow"></i>Risk Assessments</h1>
+    <p class="page-subtitle">Inherent and residual risk scoring for all assessed vendors.</p>
+  </div>
+  <a href="{{ url_for('risk_assessment_new') }}" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus-circle me-1"></i>New Assessment
+  </a>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Vendor</th>
+            <th>Date</th>
+            <th>Assessor</th>
+            <th>Inherent (L×I)</th>
+            <th>Inherent Rating</th>
+            <th>Residual (L×I)</th>
+            <th>Residual Rating</th>
+            <th>Risk Decision</th>
+            <th>Approval?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ra in risk_assessments %}
+          <tr>
+            <td>
+              <a href="{{ url_for('vendor_detail', vendor_id=ra.vendor_id) }}" style="color:var(--accent-bright); font-weight:600; font-size:0.78rem;">
+                {{ ra.vendor.vendor_name }}
+              </a>
+            </td>
+            <td style="font-size:0.75rem; font-family:var(--font-mono); color:var(--text-muted);">{{ ra.assessment_date.strftime('%Y-%m-%d') if ra.assessment_date else '—' }}</td>
+            <td style="font-size:0.78rem; color:var(--text-muted);">{{ ra.assessor or '—' }}</td>
+            <td style="text-align:center;">
+              <span class="badge bg-secondary-subtle text-secondary" style="border:1px solid rgba(255,255,255,0.06); font-family:var(--font-mono); font-size:0.72rem;">
+                {{ ra.inherent_likelihood }}×{{ ra.inherent_impact }} = {{ ra.inherent_risk_score }}
+              </span>
+            </td>
+            <td><span class="badge bg-{{ risk_badge.get(ra.inherent_risk_rating,'secondary') }}">{{ ra.inherent_risk_rating or '—' }}</span></td>
+            <td style="text-align:center;">
+              <span class="badge bg-secondary-subtle text-secondary" style="border:1px solid rgba(255,255,255,0.06); font-family:var(--font-mono); font-size:0.72rem;">
+                {{ ra.residual_likelihood }}×{{ ra.residual_impact }} = {{ ra.residual_risk_score }}
+              </span>
+            </td>
+            <td><span class="badge bg-{{ risk_badge.get(ra.residual_risk_rating,'secondary') }}">{{ ra.residual_risk_rating or '—' }}</span></td>
+            <td style="font-size:0.78rem; color:var(--text-secondary);">{{ ra.risk_decision or '—' }}</td>
+            <td>
+              {% if ra.approval_required %}
+              <span class="badge bg-warning-subtle text-warning" style="border:1px solid rgba(255,255,255,0.06)"><i class="bi bi-shield-exclamation me-1"></i>Yes</span>
+              {% else %}
+              <span style="color:var(--text-muted); font-size:0.72rem;">—</span>
+              {% endif %}
+            </td>
+          </tr>
+
+          {% if ra.key_risk_drivers or ra.control_gaps or ra.notes %}
+          <tr style="background:var(--bg-elevated);">
+            <td colspan="9" style="font-size:0.75rem; padding:0.5rem 1rem 0.5rem 2rem; color:var(--text-muted);">
+              {% if ra.key_risk_drivers %}
+              <strong style="color:var(--red);">Risk Drivers:</strong> {{ ra.key_risk_drivers }} &nbsp;|&nbsp;
+              {% endif %}
+              {% if ra.control_gaps %}
+              <strong style="color:var(--orange);">Control Gaps:</strong> {{ ra.control_gaps }} &nbsp;|&nbsp;
+              {% endif %}
+              {% if ra.compensating_controls %}
+              <strong style="color:var(--green);">Compensating Controls:</strong> {{ ra.compensating_controls }} &nbsp;|&nbsp;
+              {% endif %}
+              {% if ra.notes %}
+              <strong style="color:var(--text-secondary);">Notes:</strong> {{ ra.notes }}
+              {% endif %}
+            </td>
+          </tr>
+          {% endif %}
+          {% else %}
+          <tr>
+            <td colspan="9" style="text-align:center; color:var(--text-muted); padding:3rem;">
+              <i class="bi bi-inbox" style="font-size:1.5rem; display:block; margin-bottom:0.5rem;"></i>
+              No risk assessments found.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Scoring Legend -->
+<div class="card">
+  <div class="card-header card-header-subtle">
+    <i class="bi bi-info-circle-fill me-2"></i>Risk Scoring Reference
+  </div>
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:0.5rem;">Risk Score = Likelihood (1–5) × Impact (1–5)</p>
+        <table class="table table-sm table-bordered mb-0" style="font-size:0.78rem;">
+          <thead><tr><th>Score Range</th><th>Rating</th></tr></thead>
+          <tbody>
+            <tr><td style="font-family:var(--font-mono);">1 – 4</td><td><span class="badge bg-success">Low</span></td></tr>
+            <tr><td style="font-family:var(--font-mono);">5 – 9</td><td><span class="badge bg-info">Medium</span></td></tr>
+            <tr><td style="font-family:var(--font-mono);">10 – 16</td><td><span class="badge bg-warning">High</span></td></tr>
+            <tr><td style="font-family:var(--font-mono);">17 – 25</td><td><span class="badge bg-danger">Critical</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-6">
+        <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:0.5rem;">Risk Decision Options</p>
+        <ul class="list-unstyled" style="font-size:0.78rem;">
+          <li><span class="badge bg-success me-1">Approve</span> <span style="color:var(--text-secondary);">Controls are sufficient</span></li>
+          <li><span class="badge bg-warning me-1">Approve with Conditions</span> <span style="color:var(--text-secondary);">Remediation required</span></li>
+          <li><span class="badge bg-info me-1">Request More Evidence</span> <span style="color:var(--text-secondary);">Insufficient information</span></li>
+          <li><span class="badge bg-secondary me-1">Require Remediation</span> <span style="color:var(--text-secondary);">Gaps must be closed</span></li>
+          <li><span class="badge bg-danger me-1">Reject</span> <span style="color:var(--text-secondary);">Risk is unacceptable</span></li>
+          <li><span class="badge bg-primary me-1">Accept Risk</span> <span style="color:var(--text-secondary);">Business decision</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Follow-Up Tracker{% endblock %}
+{% block page_title %}Follow-Up Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+  <h1 class="page-title"><i class="bi bi-chat-left-dots-fill"></i>Follow-Up Tracker</h1>
+  <p class="page-subtitle">{{ follow_ups|length }} follow-up item(s) — overdue items highlighted.</p>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+  <div class="card-body" style="padding:1rem 1.25rem;">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label">Search</label>
+        <input type="text" class="form-control form-control-sm" name="q"
+               placeholder="Search follow-up question…"
+               value="{{ filters.get('q','') }}">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label">Status</label>
+        <select class="form-select form-select-sm" name="status">
+          <option value="">All</option>
+          {% for s in ['Open','Sent to Vendor','Vendor Responded','Pending Review','Closed','Overdue'] %}
+          <option value="{{ s }}" {% if filters.get('status') == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Vendor</label>
+        <select class="form-select form-select-sm" name="vendor_id">
+          <option value="">All Vendors</option>
+          {% for v in vendors %}
+          <option value="{{ v.id }}" {% if filters.get('vendor_id')|string == v.id|string %}selected{% endif %}>{{ v.vendor_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-1">
+        <button type="submit" class="btn btn-primary btn-sm w-100">Filter</button>
+      </div>
+    </form>
+    <div class="mt-2 d-flex gap-2">
+      <a href="?status=Overdue" class="badge-pill-filter {% if filters.get('status') == 'Overdue' %}active{% endif %}">
+        <i class="bi bi-exclamation-triangle-fill me-1" style="color:var(--red)"></i>Overdue Only
+      </a>
+      <a href="?status=Open" class="badge-pill-filter">Open Only</a>
+      <a href="{{ url_for('follow_ups') }}" class="badge-pill-filter"><i class="bi bi-x-circle me-1"></i>Clear</a>
+    </div>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Vendor</th>
+            <th>Follow-Up Question</th>
+            <th>Requested From</th>
+            <th>Owner</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th>Vendor Response</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% set fumap = {'Open':'warning','Overdue':'danger','Closed':'success','Sent to Vendor':'info','Vendor Responded':'primary','Pending Review':'secondary'} %}
+          {% for fu in follow_ups %}
+          <tr class="{% if fu.status == 'Overdue' %}table-danger-subtle{% elif fu.status == 'Open' %}table-warning-subtle{% endif %}">
+            <td>
+              <a href="{{ url_for('vendor_detail', vendor_id=fu.vendor_id) }}" style="color:var(--accent-bright); font-weight:600; font-size:0.78rem;">
+                {{ fu.vendor.vendor_name }}
+              </a>
+            </td>
+            <td style="font-size:0.78rem; max-width:260px; color:var(--text-primary);">
+              {{ fu.follow_up_question }}
+              {% if fu.analyst_notes %}
+              <div style="color:var(--text-muted); margin-top:0.25rem; font-style:italic; font-size:0.72rem;"><i class="bi bi-sticky-fill me-1" style="color:var(--orange)"></i>{{ fu.analyst_notes[:60] }}</div>
+              {% endif %}
+            </td>
+            <td style="font-size:0.78rem; color:var(--text-muted);">{{ fu.requested_from or '—' }}</td>
+            <td style="font-size:0.78rem; color:var(--text-muted);">{{ fu.owner or '—' }}</td>
+            <td style="font-size:0.75rem; font-family:var(--font-mono); {% if fu.due_date and fu.due_date < today and fu.status != 'Closed' %}color:var(--red); font-weight:700;{% else %}color:var(--text-muted);{% endif %}">
+              {{ fu.due_date.strftime('%Y-%m-%d') if fu.due_date else '—' }}
+              {% if fu.due_date and fu.due_date < today and fu.status == 'Overdue' %}
+              <span class="badge bg-danger ms-1" style="font-size:0.6rem;">OVERDUE</span>
+              {% endif %}
+            </td>
+            <td><span class="badge bg-{{ fumap.get(fu.status,'secondary') }}">{{ fu.status }}</span></td>
+            <td style="font-size:0.75rem; max-width:200px; color:var(--text-muted);">
+              {% if fu.vendor_response %}
+                "{{ fu.vendor_response[:80] }}{% if fu.vendor_response|length > 80 %}…{% endif %}"
+              {% elif fu.status == 'Closed' %}
+                <em>Closed</em>
+              {% else %}
+                <em style="color:var(--text-muted);">Awaiting response</em>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7" style="text-align:center; color:var(--text-muted); padding:3rem;">
+              <i class="bi bi-inbox" style="font-size:1.5rem; display:block; margin-bottom:0.5rem;"></i>
+              No follow-ups found.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
