@@ -35,7 +35,10 @@ from seed_data import seed_all
 # ---------------------------------------------------------------------------
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "data", "mandate.db")
+if os.environ.get("VERCEL"):
+    DB_PATH = "/tmp/mandate.db"
+else:
+    DB_PATH = os.path.join(BASE_DIR, "data", "mandate.db")
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{DB_PATH}"
