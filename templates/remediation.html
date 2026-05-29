@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="page-header mb-4">
-  <h1 class="page-title"><i class="bi bi-wrench-adjustable"></i>Remediation & Conditions Tracker</h1>
+  <h1 class="page-title"><i class="bi bi-wrench-adjustable me-2" aria-hidden="true"></i>Remediation & Conditions Tracker</h1>
   <p class="page-subtitle">{{ remediations|length }} remediation item(s) — conditions for approved vendors and open gaps.</p>
 </div>
 
@@ -60,11 +60,12 @@
         </div>
         {% endif %}
         <div class="row" style="font-size:0.72rem; color:var(--text-muted); margin-top:0.5rem;">
-          <div class="col-6"><i class="bi bi-person-fill me-1"></i>{{ rem.owner or '—' }}</div>
+          <div class="col-6"><i class="bi bi-person-fill me-1" aria-hidden="true"></i>{{ rem.owner or '—' }}</div>
           <div class="col-6" style="font-family:var(--font-mono); {% if rem.due_date and rem.due_date < today and rem.status not in ['Closed','Validated'] %}color:var(--red); font-weight:700;{% endif %}">
-            <i class="bi bi-calendar-fill me-1"></i>{{ rem.due_date.strftime('%Y-%m-%d') if rem.due_date else '—' }}
+            <i class="bi bi-calendar-fill me-1" aria-hidden="true"></i>{{ rem.due_date.strftime('%Y-%m-%d') if rem.due_date else '—' }}
           </div>
         </div>
+
         {% if rem.validation_method %}
         <div style="font-size:0.72rem; color:var(--text-muted); margin-top:0.3rem;"><i class="bi bi-check2-circle me-1" style="color:var(--green)"></i>{{ rem.validation_method }}</div>
         {% endif %}
