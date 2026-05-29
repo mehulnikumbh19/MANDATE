@@ -5,7 +5,7 @@
 {% block content %}
 <div class="page-header mb-4 d-flex align-items-center justify-content-between flex-wrap gap-2">
   <div>
-    <h1 class="page-title"><i class="bi bi-building-fill"></i>Vendor Inventory</h1>
+    <h1 class="page-title"><i class="bi bi-building-fill me-2" aria-hidden="true"></i>Vendor Inventory</h1>
     <p class="page-subtitle">{{ vendors|length }} third-party vendor(s) under active security review.</p>
   </div>
   <a href="{{ url_for('vendor_new') }}" class="btn btn-primary btn-sm">
@@ -64,21 +64,22 @@
       </div>
     </form>
     <div class="mt-2 d-flex gap-2 flex-wrap">
-      <a href="?phi=yes" class="badge-pill-filter {% if filters.get('phi') == 'yes' %}active{% endif %}">
-        <i class="bi bi-heart-pulse-fill me-1"></i>PHI Only
+      <a href="?phi=yes" class="badge-pill-filter {% if filters.get('phi') == 'yes' %}active{% endif %}" role="button" aria-label="Filter by PHI Only">
+        <i class="bi bi-heart-pulse-fill me-1" aria-hidden="true"></i>PHI Only
       </a>
-      <a href="?payment=yes" class="badge-pill-filter {% if filters.get('payment') == 'yes' %}active{% endif %}">
-        <i class="bi bi-credit-card-fill me-1"></i>Payment Only
+      <a href="?payment=yes" class="badge-pill-filter {% if filters.get('payment') == 'yes' %}active{% endif %}" role="button" aria-label="Filter by Payment Data Only">
+        <i class="bi bi-credit-card-fill me-1" aria-hidden="true"></i>Payment Only
       </a>
-      <a href="?review_status=Pending+Evidence" class="badge-pill-filter">
-        <i class="bi bi-folder-x me-1"></i>Pending Evidence
+      <a href="?review_status=Pending+Evidence" class="badge-pill-filter" role="button" aria-label="Filter by Pending Evidence">
+        <i class="bi bi-folder-x me-1" aria-hidden="true"></i>Pending Evidence
       </a>
-      <a href="{{ url_for('vendors') }}" class="badge-pill-filter">
-        <i class="bi bi-x-circle me-1"></i>Clear Filters
+      <a href="{{ url_for('vendors') }}" class="badge-pill-filter" role="button" aria-label="Clear all vendor filters">
+        <i class="bi bi-x-circle me-1" aria-hidden="true"></i>Clear Filters
       </a>
     </div>
   </div>
 </div>
+
 
 <!-- Table -->
 <div class="card">
