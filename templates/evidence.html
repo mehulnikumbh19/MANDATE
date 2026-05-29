@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="page-header mb-4">
-  <h1 class="page-title"><i class="bi bi-folder-fill"></i>Evidence Tracker</h1>
+  <h1 class="page-title"><i class="bi bi-folder-fill me-2" aria-hidden="true"></i>Evidence Tracker</h1>
   <p class="page-subtitle">{{ evidence|length }} evidence record(s) — missing, expired, and outdated evidence highlighted.</p>
 </div>
 
@@ -50,13 +50,14 @@
       </div>
     </form>
     <div class="mt-2 d-flex gap-2 flex-wrap">
-      <a href="?ev_status=Missing" class="badge-pill-filter"><i class="bi bi-x-circle-fill me-1" style="color:var(--red)"></i>Missing</a>
-      <a href="?ev_status=Expired" class="badge-pill-filter"><i class="bi bi-dash-circle-fill me-1" style="color:var(--text-muted)"></i>Expired</a>
-      <a href="?ev_status=Outdated" class="badge-pill-filter"><i class="bi bi-exclamation-circle-fill me-1" style="color:var(--orange)"></i>Outdated</a>
-      <a href="{{ url_for('evidence_list') }}" class="badge-pill-filter"><i class="bi bi-x-circle me-1"></i>Clear</a>
+      <a href="?ev_status=Missing" class="badge-pill-filter" role="button" aria-label="Filter by Missing status"><i class="bi bi-x-circle-fill me-1" style="color:var(--red)" aria-hidden="true"></i>Missing</a>
+      <a href="?ev_status=Expired" class="badge-pill-filter" role="button" aria-label="Filter by Expired status"><i class="bi bi-dash-circle-fill me-1" style="color:var(--text-muted)" aria-hidden="true"></i>Expired</a>
+      <a href="?ev_status=Outdated" class="badge-pill-filter" role="button" aria-label="Filter by Outdated status"><i class="bi bi-exclamation-circle-fill me-1" style="color:var(--orange)" aria-hidden="true"></i>Outdated</a>
+      <a href="{{ url_for('evidence_list') }}" class="badge-pill-filter" role="button" aria-label="Clear all evidence filters"><i class="bi bi-x-circle me-1" aria-hidden="true"></i>Clear</a>
     </div>
   </div>
 </div>
+
 
 <!-- Table -->
 <div class="card">
