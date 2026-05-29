@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="page-header mb-4">
-  <h1 class="page-title"><i class="bi bi-chat-left-dots-fill"></i>Follow-Up Tracker</h1>
+  <h1 class="page-title"><i class="bi bi-chat-left-dots-fill me-2" aria-hidden="true"></i>Follow-Up Tracker</h1>
   <p class="page-subtitle">{{ follow_ups|length }} follow-up item(s) — overdue items highlighted.</p>
 </div>
 
@@ -41,14 +41,15 @@
       </div>
     </form>
     <div class="mt-2 d-flex gap-2">
-      <a href="?status=Overdue" class="badge-pill-filter {% if filters.get('status') == 'Overdue' %}active{% endif %}">
-        <i class="bi bi-exclamation-triangle-fill me-1" style="color:var(--red)"></i>Overdue Only
+      <a href="?status=Overdue" class="badge-pill-filter {% if filters.get('status') == 'Overdue' %}active{% endif %}" role="button" aria-label="Filter by Overdue status">
+        <i class="bi bi-exclamation-triangle-fill me-1" style="color:var(--red)" aria-hidden="true"></i>Overdue Only
       </a>
-      <a href="?status=Open" class="badge-pill-filter">Open Only</a>
-      <a href="{{ url_for('follow_ups') }}" class="badge-pill-filter"><i class="bi bi-x-circle me-1"></i>Clear</a>
+      <a href="?status=Open" class="badge-pill-filter" role="button" aria-label="Filter by Open status">Open Only</a>
+      <a href="{{ url_for('follow_ups') }}" class="badge-pill-filter" role="button" aria-label="Clear all follow-up filters"><i class="bi bi-x-circle me-1" aria-hidden="true"></i>Clear</a>
     </div>
   </div>
 </div>
+
 
 <!-- Table -->
 <div class="card">
