@@ -22,7 +22,7 @@
 <!-- ===== COMMAND BAR ===== -->
 <div class="command-bar mb-4 animate-fade-in">
   <div class="command-bar-status">
-    <span class="status-dot live"></span>
+    <span class="status-dot live" aria-label="Live System Active Badge" title="System Active"></span>
     <span style="color:var(--accent-bright); font-weight:700; font-family:var(--font-mono);">{{ stats.total_vendors }}</span>
     <span>vendors tracked</span>
     <span style="color:var(--border-default);">|</span>
@@ -42,28 +42,28 @@
 <div class="row g-3 mb-4">
   <div class="col-6 col-lg-3">
     <div class="kpi-card">
-      <div class="kpi-icon icon-teal"><i class="bi bi-building-fill"></i></div>
+      <div class="kpi-icon icon-teal" aria-hidden="true"><i class="bi bi-building-fill"></i></div>
       <div class="kpi-value">{{ stats.total_vendors }}</div>
       <div class="kpi-label">Total Vendors</div>
     </div>
   </div>
   <div class="col-6 col-lg-3">
     <div class="kpi-card">
-      <div class="kpi-icon icon-red"><i class="bi bi-exclamation-triangle-fill"></i></div>
+      <div class="kpi-icon icon-red" aria-hidden="true"><i class="bi bi-exclamation-triangle-fill"></i></div>
       <div class="kpi-value" style="color:var(--red)">{{ (stats.risk_counts.get('High',0) + stats.risk_counts.get('Critical',0)) }}</div>
       <div class="kpi-label">High / Critical Risk</div>
     </div>
   </div>
   <div class="col-6 col-lg-3">
     <div class="kpi-card">
-      <div class="kpi-icon icon-orange"><i class="bi bi-folder-x"></i></div>
+      <div class="kpi-icon icon-orange" aria-hidden="true"><i class="bi bi-folder-x"></i></div>
       <div class="kpi-value" style="color:var(--orange)">{{ stats.missing_evidence }}</div>
       <div class="kpi-label">Missing Evidence</div>
     </div>
   </div>
   <div class="col-6 col-lg-3">
     <div class="kpi-card">
-      <div class="kpi-icon icon-cyan"><i class="bi bi-clock-history"></i></div>
+      <div class="kpi-icon icon-cyan" aria-hidden="true"><i class="bi bi-clock-history"></i></div>
       <div class="kpi-value" style="color:var(--cyan)">{{ stats.outdated_evidence }}</div>
       <div class="kpi-label">Outdated Evidence</div>
     </div>
@@ -75,28 +75,28 @@
 <div class="row g-3 mb-4">
   <div class="col-6 col-lg-3">
     <div class="kpi-card">
-      <div class="kpi-icon icon-red"><i class="bi bi-shield-x"></i></div>
+      <div class="kpi-icon icon-red" aria-hidden="true"><i class="bi bi-shield-x"></i></div>
       <div class="kpi-value" style="color:var(--red)">{{ stats.high_risk_responses }}</div>
       <div class="kpi-label">High-Risk Responses</div>
     </div>
   </div>
   <div class="col-6 col-lg-3">
     <div class="kpi-card">
-      <div class="kpi-icon icon-purple"><i class="bi bi-heart-pulse-fill"></i></div>
+      <div class="kpi-icon icon-purple" aria-hidden="true"><i class="bi bi-heart-pulse-fill"></i></div>
       <div class="kpi-value" style="color:var(--purple)">{{ stats.vendors_phi }}</div>
       <div class="kpi-label">PHI Vendors</div>
     </div>
   </div>
   <div class="col-6 col-lg-3">
     <div class="kpi-card">
-      <div class="kpi-icon icon-orange"><i class="bi bi-credit-card-fill"></i></div>
+      <div class="kpi-icon icon-orange" aria-hidden="true"><i class="bi bi-credit-card-fill"></i></div>
       <div class="kpi-value" style="color:var(--orange)">{{ stats.vendors_payment }}</div>
       <div class="kpi-label">Payment Data Vendors</div>
     </div>
   </div>
   <div class="col-6 col-lg-3">
     <div class="kpi-card">
-      <div class="kpi-icon icon-blue"><i class="bi bi-database-fill-lock"></i></div>
+      <div class="kpi-icon icon-blue" aria-hidden="true"><i class="bi bi-database-fill-lock"></i></div>
       <div class="kpi-value" style="color:var(--blue)">{{ stats.vendors_sensitive }}</div>
       <div class="kpi-label">Sensitive Data Vendors</div>
     </div>
@@ -138,23 +138,24 @@
   <div class="col-lg-4">
     <div class="chart-panel">
       <div class="chart-panel-header">
-        <i class="bi bi-pie-chart-fill"></i>Risk Distribution
+        <i class="bi bi-pie-chart-fill me-2" aria-hidden="true"></i>Risk Distribution
       </div>
       <div class="chart-panel-body">
-        <canvas id="riskChart" width="260" height="260"></canvas>
+        <canvas id="riskChart" width="260" height="260" aria-label="Vendor Risk Level Distribution Chart" role="img">Vendor Risk Level Distribution Chart</canvas>
       </div>
     </div>
   </div>
   <div class="col-lg-4">
     <div class="chart-panel">
       <div class="chart-panel-header">
-        <i class="bi bi-bar-chart-fill"></i>Review Status
+        <i class="bi bi-bar-chart-fill me-2" aria-hidden="true"></i>Review Status
       </div>
       <div class="chart-panel-body">
-        <canvas id="statusChart" width="260" height="260"></canvas>
+        <canvas id="statusChart" width="260" height="260" aria-label="Vendor Review Status Distribution Chart" role="img">Vendor Review Status Distribution Chart</canvas>
       </div>
     </div>
   </div>
+
   <div class="col-lg-4">
     <div class="chart-panel">
       <div class="chart-panel-header">
