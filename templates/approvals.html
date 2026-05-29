@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="page-header mb-4">
-  <h1 class="page-title"><i class="bi bi-patch-check-fill"></i>Approvals & Exceptions</h1>
+  <h1 class="page-title"><i class="bi bi-patch-check-fill me-2" aria-hidden="true"></i>Approvals & Exceptions</h1>
   <p class="page-subtitle">{{ approvals|length }} approval record(s) — exceptions and expirations flagged.</p>
 </div>
 
@@ -26,15 +26,16 @@
       </div>
       <div class="col-md-auto ms-md-auto">
         <div class="d-flex gap-2">
-          <a href="?status=Pending+Approval" class="badge-pill-filter"><i class="bi bi-clock-fill me-1" style="color:var(--blue)"></i>Pending</a>
-          <a href="?status=Approved+with+Exception" class="badge-pill-filter"><i class="bi bi-exclamation-triangle-fill me-1" style="color:var(--orange)"></i>With Exception</a>
-          <a href="?status=Expired" class="badge-pill-filter"><i class="bi bi-dash-circle-fill me-1" style="color:var(--text-muted)"></i>Expired</a>
-          <a href="{{ url_for('approvals') }}" class="badge-pill-filter"><i class="bi bi-x-circle me-1"></i>Clear</a>
+          <a href="?status=Pending+Approval" class="badge-pill-filter" role="button" aria-label="Filter by Pending status"><i class="bi bi-clock-fill me-1" style="color:var(--blue)" aria-hidden="true"></i>Pending</a>
+          <a href="?status=Approved+with+Exception" class="badge-pill-filter" role="button" aria-label="Filter by Approved with Exception status"><i class="bi bi-exclamation-triangle-fill me-1" style="color:var(--orange)" aria-hidden="true"></i>With Exception</a>
+          <a href="?status=Expired" class="badge-pill-filter" role="button" aria-label="Filter by Expired status"><i class="bi bi-dash-circle-fill me-1" style="color:var(--text-muted)" aria-hidden="true"></i>Expired</a>
+          <a href="{{ url_for('approvals') }}" class="badge-pill-filter" role="button" aria-label="Clear all status filters"><i class="bi bi-x-circle me-1" aria-hidden="true"></i>Clear</a>
         </div>
       </div>
     </form>
   </div>
 </div>
+
 
 <!-- Table -->
 <div class="card">
