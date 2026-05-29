@@ -46,8 +46,13 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "mandate-secret-key-2025"
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10 MB upload limit
 
-os.makedirs(os.path.join(BASE_DIR, "data"), exist_ok=True)
-os.makedirs(os.path.join(BASE_DIR, "exports"), exist_ok=True)
+if os.environ.get("VERCEL"):
+    EXPORTS_DIR = "/tmp/exports"
+    os.makedirs(EXPORTS_DIR, exist_ok=True)
+else:
+    EXPORTS_DIR = os.path.join(BASE_DIR, "exports")
+    os.makedirs(os.path.join(BASE_DIR, "data"), exist_ok=True)
+    os.makedirs(EXPORTS_DIR, exist_ok=True)
 
 init_db(app)
 
@@ -474,14 +479,14 @@ def assessor_guide():
 
 @app.route("/reports/export/excel")
 def export_report_excel():
-    filepath = export_excel(app)
+    filepath = export_excel(app, export_dir=EXPORTS_DIR)
     return send_file(filepath, as_attachment=True)
 
 
 @app.route("/reports/export/markdown")
 def export_report_markdown():
     report = build_management_report(app)
-    filepath = export_markdown_report(report)
+    filepath = export_markdown_report(report, export_dir=EXPORTS_DIR)
     return send_file(filepath, as_attachment=True)
 
 
@@ -523,7 +528,7 @@ def import_data():
 
 @app.route("/export")
 def export_data():
-    filepath = export_excel(app)
+    filepath = export_excel(app, export_dir=EXPORTS_DIR)
     return send_file(filepath, as_attachment=True)
 
 
